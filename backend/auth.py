@@ -67,7 +67,7 @@ async def send_otp(data: dict):
 
 
 # =========================
-# VERIFY OTP
+# VERIFY OTP (UPDATED)
 # =========================
 @router.post("/verify-otp")
 async def verify_otp(data: dict):
@@ -82,23 +82,35 @@ async def verify_otp(data: dict):
     if not record:
         raise HTTPException(status_code=400, detail="OTP not found")
 
-    if record["otp"] != otp:
+    if str(record["otp"]) != str(otp):
         raise HTTPException(status_code=400, detail="Invalid OTP")
 
     if record["expires_at"] < datetime.utcnow():
         raise HTTPException(status_code=400, detail="OTP expired")
 
+    # delete OTP after use
     await db.otp_sessions.delete_many({"email": email})
 
-    await db.users.update_one(
-        {"email": email},
-        {
-            "$set": {"last_login": datetime.utcnow()},
-            "$setOnInsert": {"created_at": datetime.utcnow()}
-        },
-        upsert=True
-    )
+    # get existing user (if exists)
+    user = await db.users.find_one({"email": email})
 
+    # create or update user
+    if not user:
+        await db.users.insert_one({
+            "email": email,
+            "created_at": datetime.utcnow(),
+            "last_login": datetime.utcnow(),
+            "github_username": None
+        })
+        github_username = None
+    else:
+        await db.users.update_one(
+            {"email": email},
+            {"$set": {"last_login": datetime.utcnow()}}
+        )
+        github_username = user.get("github_username")
+
+    # generate JWT
     token = jwt.encode(
         {
             "email": email,
@@ -108,8 +120,30 @@ async def verify_otp(data: dict):
         algorithm=JWT_ALGORITHM
     )
 
-    return {"token": token}
+    return {
+        "token": token,
+        "email": email,
+        "github_username": github_username
+    }
 
+
+# =========================
+# SAVE GITHUB USERNAME (NEW)
+# =========================
+@router.post("/save-github")
+async def save_github(data: dict):
+    email = data.get("email")
+    github_username = data.get("github_username")
+
+    if not email or not github_username:
+        raise HTTPException(status_code=400, detail="Email and GitHub username required")
+
+    await db.users.update_one(
+        {"email": email},
+        {"$set": {"github_username": github_username}}
+    )
+
+    return {"message": "GitHub username saved"}
 
 # =========================
 # GITHUB LOGIN
@@ -119,19 +153,22 @@ async def github_login():
     github_auth_url = (
         "https://github.com/login/oauth/authorize"
         f"?client_id={GITHUB_CLIENT_ID}"
-        "&scope=user:email"
+        f"&redirect_uri=http://127.0.0.1:8000/auth/github/callback"
+        "&scope=read:user user:email"
+        "&state=secure_random_state"
     )
     return RedirectResponse(github_auth_url)
 
 
 # =========================
-# GITHUB CALLBACK
+# GITHUB CALLBACK (FIXED)
 # =========================
 @router.get("/github/callback")
-async def github_callback(code: str):
+async def github_callback(code: str, state: str = None):
+
     async with httpx.AsyncClient() as client:
 
-        # Exchange code for access token
+        # 1️⃣ Exchange code for access token
         token_response = await client.post(
             "https://github.com/login/oauth/access_token",
             headers={"Accept": "application/json"},
@@ -139,6 +176,7 @@ async def github_callback(code: str):
                 "client_id": GITHUB_CLIENT_ID,
                 "client_secret": GITHUB_CLIENT_SECRET,
                 "code": code,
+                "redirect_uri": "http://127.0.0.1:8000/auth/github/callback",
             },
         )
 
@@ -146,43 +184,53 @@ async def github_callback(code: str):
         access_token = token_json.get("access_token")
 
         if not access_token:
-            raise HTTPException(status_code=400, detail="Failed to get access token")
+            raise HTTPException(status_code=400, detail="Failed to get GitHub token")
 
-        # Fetch GitHub user profile
+        # 2️⃣ Get user info
         user_response = await client.get(
             "https://api.github.com/user",
-            headers={"Authorization": f"Bearer {access_token}"}
+            headers={"Authorization": f"token {access_token}"}
         )
+
+        if user_response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Failed to fetch GitHub user")
 
         user_data = user_response.json()
 
-    email = user_data.get("email")
+        email = user_data.get("email")
+        github_username = user_data.get("login")
 
-    # If email is private, fetch from emails API
-    if not email:
-        async with httpx.AsyncClient() as client:
+        # 3️⃣ If email private → fetch emails
+        if not email:
             emails_response = await client.get(
                 "https://api.github.com/user/emails",
-                headers={"Authorization": f"Bearer {access_token}"}
+                headers={"Authorization": f"token {access_token}"}
             )
-            emails = emails_response.json()
-            for e in emails:
-                if e.get("primary"):
-                    email = e.get("email")
-                    break
 
-    if not email:
-        raise HTTPException(status_code=400, detail="Email not found from GitHub")
+            if emails_response.status_code == 200:
+                emails = emails_response.json()
+                for e in emails:
+                    if e.get("primary"):
+                        email = e.get("email")
+                        break
 
+        if not email:
+            raise HTTPException(status_code=400, detail="Email not found from GitHub")
+
+    # 4️⃣ Save user in DB
     await db.users.update_one(
         {"email": email},
         {
-            "$set": {"last_login": datetime.utcnow()},
+            "$set": {
+                "last_login": datetime.utcnow(),
+                "github_username": github_username
+            },
             "$setOnInsert": {"created_at": datetime.utcnow()}
         },
         upsert=True
     )
 
+    # 5️⃣ Generate JWT
     token = jwt.encode(
         {
             "email": email,
@@ -192,12 +240,19 @@ async def github_callback(code: str):
         algorithm=JWT_ALGORITHM
     )
 
-    return RedirectResponse(f"{FRONTEND_URL}/oauth-success?token={token}")
-
+    # 6️⃣ Redirect to frontend
+    return RedirectResponse(
+        f"{FRONTEND_URL}/oauth-success?token={token}&username={github_username}"
+    )
 
 # =========================
-# PROTECTED ROUTE
+# GET CURRENT USER
 # =========================
 @router.get("/me")
 async def get_me(current_user: str = Depends(get_current_user)):
-    return {"email": current_user}
+    user = await db.users.find_one({"email": current_user})
+
+    return {
+        "email": current_user,
+        "github_username": user.get("github_username") if user else None
+    }

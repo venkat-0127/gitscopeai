@@ -1,21 +1,53 @@
 import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function OAuthSuccess() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    const token = searchParams.get("token");
-    if (token) {
+    try {
+      const params = new URLSearchParams(window.location.search);
+
+      const token = params.get("token");
+      const username = params.get("username");
+
+      console.log("OAuth Success → Token:", token);
+      console.log("OAuth Success → Username:", username);
+
+      // ❌ If no token → go back to login
+      if (!token) {
+        alert("GitHub login failed. Try again.");
+        navigate("/");
+        return;
+      }
+
+      // ✅ Save token
       localStorage.setItem("token", token);
-      navigate("/home");
-    } else {
+
+      // ✅ Save user safely
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          github_username: username || null,
+        })
+      );
+
+      // ✅ Small delay (ensures storage is saved before navigation)
+      setTimeout(() => {
+        navigate("/home");
+      }, 500);
+
+    } catch (error) {
+      console.error("OAuth Error:", error);
       navigate("/");
     }
-  }, [navigate, searchParams]);
+  }, [navigate]);
 
-  return <div>Logging in...</div>;
+  return (
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">
+      <h2 className="text-xl">Logging in with GitHub...</h2>
+    </div>
+  );
 }
 
 export default OAuthSuccess;
