@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Newspaper Hub — Discover</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --card: #fff;
+      --muted: #667085;
+      --accent: #f36b4f;
+      --surface: #eef2f4;
+      --text: #0f1724;
+      --sidebar: #0f2629;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text)
+    }
+
+    /* layout: sidebar fixed at left, main content to the right */
+    .wrap {
+      margin-left: 260px;
+      /* space for fixed sidebar */
+      max-width: 1200px;
+      padding: 18px;
+    }
+
+    .layout {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start
+    }
+
+    /* header + hamburger */
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px
+    }
+
+    .hamburger {
+      display: none;
+      background: transparent;
+      border: 0;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer
+    }
+
+    .hamburger .bar {
+      width: 22px;
+      height: 2px;
+      background: #0f2629;
+      margin: 4px 0;
+      border-radius: 2px;
+      display: block
+    }
+
+    /* sidebar (fixed) */
+    .sidebar {
+      width: 260px;
+      background: var(--sidebar);
+      color: #fff;
+      padding: 20px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      border-radius: 0;
+      overflow: auto;
+      transition: transform .22s ease, opacity .22s;
+      z-index: 1100;
+    }
+
+    .sidebar.hidden-mobile {
+      transform: translateX(-110%);
+      opacity: 0;
+      height: 0;
+      padding: 0;
+      margin: 0;
+      border-radius: 0
+    }
+
+    .sidebar h2 {
+      margin: 0 0 14px;
+      font-size: 24px
+    }
+
+    .nav {
+      list-style: none;
+      padding: 0;
+      margin: 0
+    }
+
+    .nav li {
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      background: transparent
+    }
+
+    .nav li.active {
+      background: #0b3a3f
+    }
+
+    .nav li:hover {
+      opacity: .95
+    }
+
+    .tip {
+      margin-top: 18px;
+      color: #d6e6e6;
+      font-size: 13px
+    }
+
+    /* main */
+    main {
+      flex: 1;
+      min-width: 0
+    }
+
+    /* make main area itself scrollable, leaving sidebar fixed */
+    .content-viewport {
+      height: calc(100vh - 36px);
+      /* account for possible header row */
+      overflow: auto;
+      padding-bottom: 40px;
+    }
+
+    header.top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px
+    }
+
+    header.top h1 {
+      margin: 0;
+      font-size: 30px
+    }
+
+    .card {
+      background: var(--card);
+      padding: 14px;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(12, 20, 30, 0.04)
+    }
+
+    .discover-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-top: 12px
+    }
+
+    .paper-btn {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #e6eef0;
+      background: linear-gradient(180deg, #fff, #fbfcfd);
+      cursor: pointer;
+      text-align: left
+    }
+
+    .paper-btn h4 {
+      margin: 0;
+      font-size: 15px
+    }
+
+    .paper-btn small {
+      color: var(--muted)
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit
+    }
+
+    .btn.secondary {
+      background: #fff;
+      border: 1px solid #e6e6e6
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #fff
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border: 1px solid #e6e6e6
+    }
+
+    .list-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px
+    }
+
+    .list-table th,
+    .list-table td {
+      padding: 10px;
+      border-bottom: 1px solid #f0f2f4;
+      text-align: left;
+      vertical-align: middle
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 28px
+    }
+
+    .tag {
+      display: inline-block;
+      background: var(--surface);
+      padding: 4px 8px;
+      border-radius: 999px;
+      margin: 2px;
+      font-size: 12px
+    }
+
+    .trend-item {
+      padding: 10px;
+      border-bottom: 1px solid #f0f2f4
+    }
+
+    .muted {
+      color: var(--muted)
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      padding: 8px;
+      border: 1px solid #e6e6e6;
+      border-radius: 6px;
+      width: 100%
+    }
+
+    /* small helpers */
+    .panel {
+      display: block;
+    }
+
+    /* mobile / responsive */
+    @media (max-width:900px) {
+      .wrap {
+        margin-left: 0;
+        padding: 12px
+      }
+
+      .layout {
+        flex-direction: column
+      }
+
+      .sidebar {
+        width: 260px;
+        position: fixed;
+        left: 12px;
+        top: 72px;
+        height: calc(100vh - 90px);
+        z-index: 1100;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12)
+      }
+
+      .hamburger {
+        display: inline-block
+      }
+
+      .sidebar.hidden-mobile {
+        transform: translateX(-120%)
+      }
+
+      /* reduce margins on small */
+      .discover-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 8px
+      }
+
+      header.top h1 {
+        font-size: 20px
+      }
+
+      .card {
+        padding: 12px
+      }
+
+      main {
+        margin-top: 8px
+      }
+
+      /* overlay when sidebar open */
+      body.sidebar-open .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: 1050;
+        display: block;
+      }
+
+      .content-viewport {
+        height: auto;
+      }
+
+      /* don't constrain on very small screens */
+    }
+
+    /* make table more compact on very small */
+    @media (max-width:420px) {
+      .discover-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 6px
+      }
+
+      .paper-btn h4 {
+        font-size: 14px
+      }
+
+      .paper-btn {
+        padding: 10px
+      }
+
+      .list-table th,
+      .list-table td {
+        padding: 8px
+      }
+    }
+
+    /* small style for delete button */
+    .btn.danger {
+      background: #e45858;
+      color: white;
+      border: 0;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    /* Upload panel local-items area */
+    .local-uploads {
+      margin-top: 12px;
+      border-top: 1px dashed #e9eef0;
+      padding-top: 10px;
+    }
+
+    .local-uploads .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #f6f7f9;
+    }
+
+    .small-muted {
+      font-size: 13px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar" id="sidebar" aria-label="Navigation">
+    <h2>Newspaper Hub</h2>
+    <ul class="nav" role="menu">
+      <li class="active" data-view="discover">Discover</li>
+      <li data-view="trending">Trending</li>
+      <li data-view="upload">Upload</li>
+      <li data-view="saved">My Saved</li>
+    </ul>
+
+    <div class="tip">
+      Click a paper to view its latest archived articles. Trending shows top articles across feeds.
+    </div>
+    <div style="margin-top:14px">
+      <button class="btn secondary" onclick="window.location.href='/tiles'">← Back</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="header-row">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="hamburger" id="hambBtn" aria-label="Toggle menu" title="Menu">
+          <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- MAIN -->
+      <main id="mainContent">
+        <div class="content-viewport">
+          <!-- DISCOVER PANEL -->
+          <section id="panel-discover" class="card panel active">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+              <div>
+                <strong>Available Newspapers</strong>
+                <div class="muted" style="font-size:13px">English + Telugu curated list</div>
+              </div>
+
+              <div class="controls">
+                <button class="btn secondary" id="btnRefresh">Refresh list</button>
+                <button class="btn primary" id="btnShowAll">Show all</button>
+                <button class="btn ghost" id="btnShowPopular"
+                  title="Show a curated popular set (client-side)"><small>Popular</small></button>
+              </div>
+            </div>
+
+            <div class="discover-grid" id="paperList" aria-live="polite"></div>
+
+            <div style="margin-top:16px">
+              <div class="card" style="padding:12px">
+                <h3 style="margin:0 0 8px">Selected Paper: <span id="selectedPaper">—</span></h3>
+                <div id="paperActions" style="margin-bottom:10px"></div>
+                <table class="list-table" id="articlesTable" aria-live="polite">
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th style="width:90px">Year</th>
+                      <th style="width:220px">Tags</th>
+                      <th style="width:180px">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="articlesBody">
+                    <tr>
+                      <td colspan="4" class="empty">Select a newspaper above to load articles.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- TRENDING PANEL -->
+          <section id="panel-trending" class="card panel" style="margin-top:14px;display:none">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <strong>Trending Articles</strong>
+                <div class="muted" style="font-size:13px">Top articles across feeds</div>
+              </div>
+              <div>
+                <button class="btn secondary" id="trendEn">EN</button>
+                <button class="btn secondary" id="trendTe">TE</button>
+              </div>
+            </div>
+            <div id="trendingBody" style="margin-top:12px">Loading trending…</div>
+          </section>
+
+          <!-- UPLOAD PANEL -->
+          <section id="panel-upload" class="panel" style="margin-top:14px;display:none">
+            <div class="card">
+              <h3>Upload Newspaper</h3>
+              <label style="display:block;margin-top:8px">Title</label>
+              <input id="upTitle" type="text" />
+              <label style="display:block;margin-top:8px">Publication</label>
+              <input id="upPub" type="text" />
+              <label style="display:block;margin-top:8px">Year</label>
+              <input id="upYear" type="number" min="1900" max="2100" />
+              <label style="display:block;margin-top:8px">Tags (comma separated)</label>
+              <input id="upTags" type="text" placeholder="education,technology" />
+              <label style="display:block;margin-top:8px">URL / PDF</label>
+              <input id="upUrl" type="text" />
+              <div style="margin-top:10px">
+                <button class="btn primary" onclick="uploadNews()">Upload</button>
+                <span id="uploadMsg" style="margin-left:12px;color:green"></span>
+              </div>
+
+              <!-- Local-upload helper: show uploaded IDs + delete-by-id -->
+              <div class="local-uploads" id="localUploadsArea">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div class="small-muted">Local uploads (saved in browser):</div>
+                  <button class="btn secondary" onclick="refreshLocalUploads()">Refresh</button>
+                </div>
+                <div id="localUploadsList" style="margin-top:8px"></div>
+
+                <div style="margin-top:10px">
+                  <label class="small-muted">Delete by ID (paste id to try deleting from server)</label>
+                  <div style="display:flex;gap:8px;margin-top:6px">
+                    <input id="deleteIdInput" type="text" placeholder="paste id here" />
+                    <button class="btn danger" onclick="deleteByIdInput()">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SAVED PANEL -->
+          <section id="panel-saved" class="panel" style="margin-top:14px;display:none">
+            <div class="card">
+              <h3>My Saved</h3>
+              <div id="savedList">No saved items.</div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- overlay used on small screens when sidebar open -->
+  <div id="overlay" class="overlay" style="display:none;"></div>
+
+  <script>
+    /* ------------- Configuration -------------- */
+    /* default origin (same origin). If your backend runs on another host/port,
+       set ORIGIN = "http://localhost:8083" */
+    const ORIGIN = "";
+    const API_ARCHIVE = ORIGIN + "/api/newspapers";
+    const API_RSS = ORIGIN + "/api/rss";
+    const PAGE_SIZE = 20;
+
+    /* delete endpoints to try (order matters). update if your backend uses another path */
+    const tryDeleteEndpoints = [
+      (id) => `${API_ARCHIVE}/delete/${id}`,
+      (id) => `${API_ARCHIVE}/${id}`
+    ];
+
+    /* ------------- Papers list (curated) ------- */
+    const PAPERS = [
+      { name: "The Hindu", lang: "en" },
+      { name: "Times of India", lang: "en" },
+      { name: "Indian Express", lang: "en" },
+      { name: "The Economic Times", lang: "en" },
+      { name: "Eenadu", lang: "te" },
+      { name: "Sakshi", lang: "te" },
+      { name: "Andhra Jyothi", lang: "te" },
+      { name: "Mana Telangana", lang: "te" }
+    ];
+
+    /* ------------- DOM refs & state ------------ */
+    const paperListEl = document.getElementById("paperList");
+    const articlesBody = document.getElementById("articlesBody");
+    const selectedPaperEl = document.getElementById("selectedPaper");
+    const paperActionsEl = document.getElementById("paperActions");
+    const trendingBody = document.getElementById("trendingBody");
+    const savedListEl = document.getElementById("savedList");
+
+    const sidebar = document.getElementById("sidebar");
+    const hambBtn = document.getElementById("hambBtn");
+    const overlay = document.getElementById("overlay");
+
+    const localUploadsList = document.getElementById("localUploadsList");
+    const localUploadsArea = document.getElementById("localUploadsArea");
+
+    let currentPaper = null;
+    let currentLang = 'en';
+    let currentPage = 0;
+    let totalElements = 0;
+
+    /* ------------- Helpers: sidebar on mobile ---- */
+    function showSidebar() {
+      sidebar.classList.remove("hidden-mobile");
+      overlay.style.display = "block";
+      document.body.classList.add("sidebar-open");
+    }
+    function hideSidebar() {
+      sidebar.classList.add("hidden-mobile");
+      overlay.style.display = "none";
+      document.body.classList.remove("sidebar-open");
+    }
+    hambBtn.addEventListener("click", () => {
+      if (sidebar.classList.contains("hidden-mobile")) showSidebar();
+      else hideSidebar();
+    });
+    overlay.addEventListener("click", hideSidebar);
+
+    /* ensure sidebar correct on load/resize */
+    function updateSidebarStateOnResize() {
+      if (window.innerWidth <= 900) {
+        // mobile: hide by default
+        sidebar.classList.add("hidden-mobile");
+        overlay.style.display = "none";
+        // make wrap full width
+        document.querySelector(".wrap").style.marginLeft = "0";
+      } else {
+        // desktop: always show fixed sidebar
+        sidebar.classList.remove("hidden-mobile");
+        overlay.style.display = "none";
+        document.body.classList.remove("sidebar-open");
+        document.querySelector(".wrap").style.marginLeft = "260px";
+      }
+    }
+    window.addEventListener("resize", updateSidebarStateOnResize);
+    window.addEventListener("load", updateSidebarStateOnResize);
+
+    /* ------------- Wire nav -------------------- */
+    document.querySelectorAll(".nav li").forEach(li => {
+      li.onclick = () => {
+        document.querySelectorAll(".nav li").forEach(x => x.classList.remove("active"));
+        li.classList.add("active");
+        const view = li.dataset.view;
+        showPanel(view);
+        if (window.innerWidth <= 900) hideSidebar();
+      };
+    });
+    function showPanel(name) {
+      document.querySelectorAll(".panel").forEach(p => p.style.display = "none");
+      if (name === "discover") { document.getElementById("panel-discover").style.display = "block"; }
+      if (name === "trending") { document.getElementById("panel-trending").style.display = "block"; loadTrending("en"); }
+      if (name === "upload") { document.getElementById("panel-upload").style.display = "block"; refreshLocalUploads(); }
+      if (name === "saved") { document.getElementById("panel-saved").style.display = "block"; renderSaved(); }
+    }
+
+    /* ------------- Render curated paper buttons - */
+    function renderPaperButtons() {
+      paperListEl.innerHTML = "";
+      PAPERS.forEach(p => {
+        const btn = document.createElement("div");
+        btn.className = "paper-btn";
+        btn.innerHTML = `<h4>${escapeHtml(p.name)}</h4><small>${p.lang === "te" ? "Telugu" : "English"}</small>`;
+        btn.addEventListener("click", () => selectPaper(p.name, p.lang));
+        paperListEl.appendChild(btn);
+      });
+    }
+    document.getElementById("btnRefresh").onclick = () => renderPaperButtons();
+    document.getElementById("btnShowAll").onclick = () => {
+      selectedPaperEl.textContent = "All publications";
+      paperActionsEl.innerHTML = '';
+      const r = document.createElement("button"); r.className = "btn secondary"; r.textContent = "Refresh"; r.onclick = () => loadArticlesFor(null, true);
+      paperActionsEl.appendChild(r);
+      currentPaper = null; currentLang = 'en'; currentPage = 0; loadArticlesFor(null, true);
+    };
+    document.getElementById("btnShowPopular").onclick = () => showPopular();
+
+    /* ------------- Select & load articles ---------- */
+    async function selectPaper(name, lang) {
+      currentPaper = name;
+      currentLang = (lang || 'en');
+      currentPage = 0;
+      selectedPaperEl.textContent = name + (lang ? ` (${lang.toUpperCase()})` : "");
+      paperActionsEl.innerHTML = '';
+      const btnR = document.createElement("button"); btnR.className = "btn secondary"; btnR.textContent = "Refresh";
+      btnR.onclick = () => loadArticlesFor(name, false);
+      paperActionsEl.appendChild(btnR);
+      const btnS = document.createElement("button"); btnS.className = "btn ghost"; btnS.textContent = "Search Web";
+      btnS.style.marginLeft = '8px';
+      btnS.onclick = () => searchWebFor(name);
+      paperActionsEl.appendChild(btnS);
+      await loadArticlesFor(name, false);
+    }
+
+    async function loadArticlesFor(pubName, isAll) {
+      articlesBody.innerHTML = `<tr><td colspan="4" class="empty">Loading articles…</td></tr>`;
+      try {
+        let url;
+        if (isAll || !pubName) {
+          url = `${API_ARCHIVE}/list?page=0&size=${PAGE_SIZE}`;
+        } else {
+          url = `${API_ARCHIVE}/list?pub=${encodeURIComponent(pubName)}&page=0&size=${PAGE_SIZE}`;
+        }
+        const res = await fetch(url, { credentials: "include" });
+        if (!res.ok) throw new Error("Failed to fetch articles");
+        const data = await res.json();
+        const items = data.content || [];
+        totalElements = data.totalElements || 0;
+
+        // If DB returned nothing, try RSS fallback for this publication (helps when DB empty)
+        if (!items.length && pubName) {
+          try {
+            const rssRes = await fetch(`${API_RSS}/search?source=${encodeURIComponent(pubName)}&limit=12`, { credentials: "include" });
+            if (rssRes.ok) {
+              const rssItems = await rssRes.json();
+              if (Array.isArray(rssItems) && rssItems.length) {
+                renderArticleRows(rssItems.map(it => normalizeRssItem(it)));
+                return;
+              }
+            }
+          } catch (e) {
+            // ignore internal rss fallback error
+          }
+          articlesBody.innerHTML = `<tr><td colspan="4" class="empty">No newspapers found for "${escapeHtml(pubName)}"</td></tr>`;
+          return;
+        }
+
+        if (!items.length) {
+          articlesBody.innerHTML = `<tr><td colspan="4" class="empty">No newspapers found</td></tr>`;
+          return;
+        }
+        renderArticleRows(items);
+      } catch (err) {
+        console.error(err);
+        articlesBody.innerHTML = `<tr><td colspan="4" class="empty">Error loading articles.</td></tr>`;
+      }
+    }
+
+    /* normalize RSS item to the article model your UI expects */
+    function normalizeRssItem(it) {
+      return {
+        id: it.id || it.guid || "",
+        title: it.title || it.titleText || "",
+        link: it.link || it.url || it.downloadUrl || "",
+        publishedAt: it.publishedAt || it.pubDate || it.published || null,
+        source: it.source || it.pub || it.feed || "",
+        tags: (it.tags || it.category || "").toString(),
+        year: (it.publishedAt ? new Date(it.publishedAt).getFullYear() : (it.year || ""))
+      };
+    }
+
+    /* ------------- Render rows & show Delete for uploads ------------- */
+    /* We keep a local list of uploaded IDs in localStorage so uploads show Delete button.
+       Backend may also return a flag — we detect several common names (uploaded, isUploaded, createdBy).
+    */
+    function getLocalUploadedIds() {
+      try { return JSON.parse(localStorage.getItem("uploadedNewsIds") || "[]"); } catch (e) { return []; }
+    }
+    function addLocalUploadedId(id) {
+      if (!id) return;
+      const arr = getLocalUploadedIds();
+      if (!arr.includes(String(id))) arr.push(String(id));
+      localStorage.setItem("uploadedNewsIds", JSON.stringify(arr));
+    }
+    function removeLocalUploadedId(id) {
+      let arr = getLocalUploadedIds();
+      arr = arr.filter(x => String(x) !== String(id));
+      localStorage.setItem("uploadedNewsIds", JSON.stringify(arr));
+    }
+
+    function renderArticleRows(items) {
+      articlesBody.innerHTML = "";
+      const localUploaded = getLocalUploadedIds();
+      items.forEach(it => {
+        const title = escapeHtml(it.title || "Untitled");
+        const year = it.publishedAt ? (new Date(it.publishedAt).getFullYear()) : (it.year || "");
+        const tags = (it.tags || it.tag || "").toString().split(",").map(t => t.trim()).filter(Boolean).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join(" ");
+        const link = it.link || it.url || it.downloadUrl || "";
+        const good = isRealUrl(link);
+
+        const tr = document.createElement("tr");
+        const tdTitle = document.createElement("td"); tdTitle.innerHTML = title;
+        const tdYear = document.createElement("td"); tdYear.textContent = year;
+        const tdTags = document.createElement("td"); tdTags.innerHTML = tags;
+        const tdActions = document.createElement("td");
+
+        // Open / Search
+        if (good) {
+          const btn = document.createElement("button");
+          btn.className = "btn secondary";
+          btn.textContent = "Open";
+          btn.addEventListener("click", () => openAndTrack(it.id || "", link));
+          tdActions.appendChild(btn);
+        } else {
+          const btn = document.createElement("button");
+          btn.className = "btn primary";
+          btn.textContent = "Search Web";
+          btn.addEventListener("click", () => {
+            const s = buildSearchUrl(it.title || "", it.pub || it.source || "", currentLang);
+            openAndTrack("", s);
+          });
+          tdActions.appendChild(btn);
+        }
+
+        // Determine whether to show Delete:
+        // show if backend flagged it (it.uploaded / it.isUploaded / it.createdBy === 'upload' / it.origin === 'upload')
+        // OR if we have recorded the id in localStorage after a successful upload.
+        const idStr = String(it.id || it.guid || it._id || "");
+        const backendFlag = it.uploaded || it.isUploaded || it.createdBy === 'upload' || it.origin === 'upload';
+        const localFlag = idStr && localUploaded.includes(idStr);
+
+        if (idStr && (backendFlag || localFlag)) {
+          const del = document.createElement("button");
+          del.className = "btn danger";
+          del.style.marginLeft = "8px";
+          del.textContent = "Delete";
+          del.addEventListener("click", () => attemptDeleteWithConfirm(idStr, it.title || ""));
+          tdActions.appendChild(del);
+        }
+
+        tr.appendChild(tdTitle);
+        tr.appendChild(tdYear);
+        tr.appendChild(tdTags);
+        tr.appendChild(tdActions);
+        articlesBody.appendChild(tr);
+      });
+    }
+
+    /* ------------- Deletion flow ----------------- */
+    async function attemptDeleteWithConfirm(id, title) {
+      if (!id) return alert("Can't delete: missing id");
+      const ok = confirm(`Delete this entry?\n\n${title}\n\nThis will attempt to delete the record from the server.`);
+      if (!ok) return;
+      try {
+        let deleted = false;
+        let lastErr = null;
+        for (const ep of tryDeleteEndpoints) {
+          try {
+            const url = ep(id);
+            const res = await fetch(url, { method: "DELETE", credentials: "include" });
+            if (res.ok) {
+              deleted = true;
+              break;
+            } else {
+              // if 404 try next endpoint, otherwise capture message
+              if (res.status === 404) { lastErr = `Not found at ${url}`; continue; }
+              const txt = await res.text().catch(() => res.status);
+              lastErr = `Failed (${res.status}): ${txt}`;
+            }
+          } catch (e) {
+            lastErr = e.message || String(e);
+          }
+        }
+        if (deleted) {
+          // remove local marker if any, refresh current view
+          removeLocalUploadedId(id);
+          alert("Deleted successfully.");
+          // refresh current listing
+          if (currentPaper) loadArticlesFor(currentPaper, false);
+          else loadArticlesFor(null, true);
+          // refresh local uploads UI in case it was an uploaded item
+          refreshLocalUploads();
+        } else {
+          alert("Delete failed: " + (lastErr || "unknown error"));
+        }
+      } catch (e) {
+        console.error(e);
+        alert("Delete failed: " + e.message);
+      }
+    }
+
+    /* allow manual delete from the 'Delete by ID' input */
+    function deleteByIdInput() {
+      const id = document.getElementById("deleteIdInput").value.trim();
+      if (!id) return alert("Paste an ID to delete.");
+      attemptDeleteWithConfirm(id, `ID: ${id}`);
+    }
+
+    /* ------------- Utilities: URL/opening ------------- */
+    function normalizeUrl(u) {
+      if (!u) return null;
+      u = String(u).trim();
+      if (/^https?:\/\//i.test(u)) return u;
+      if (/^\/\//.test(u)) return 'https:' + u;
+      if (/^(data:|mailto:|tel:)/i.test(u)) return u;
+      if (/[a-z0-9\-]+\.[a-z]{2,}/i.test(u)) return 'https://' + u.replace(/^\/*/, '');
+      return null;
+    }
+    function isRealUrl(u) {
+      const n = normalizeUrl(u);
+      if (!n) return false;
+      try {
+        const host = (new URL(n)).hostname.replace(/^www\./, '').toLowerCase();
+        if (!host) return false;
+        if (host.includes('example.') || host === '127.0.0.1' || host === 'localhost') return false;
+        return true;
+      } catch (e) { return false; }
+    }
+    async function openAndTrack(id, rawLink) {
+      try {
+        const link = normalizeUrl(rawLink) || rawLink || '';
+        if (id) {
+          try { fetch(`${API_ARCHIVE}/click/${id}`, { method: 'POST', credentials: 'include' }).catch(() => { }); } catch (e) { }
+        }
+        let final = normalizeUrl(link) || null;
+        if (!final) {
+          const q = encodeURIComponent(String(rawLink || '').slice(0, 200));
+          final = `https://news.google.com/search?q=${q}&hl=en-IN&gl=IN&ceid=IN:en`;
+        }
+        const a = document.createElement('a');
+        a.href = final;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      } catch (err) {
+        console.error('openAndTrack error', err);
+        try { window.open(rawLink, '_blank', 'noopener'); } catch (e) { console.error(e); }
+      }
+    }
+    function buildSearchUrl(title, pub, lang = "en") { const q = [title || "", pub || ""].filter(Boolean).join(" "); return `https://news.google.com/search?q=${encodeURIComponent(q)}&hl=${lang === 'te' ? 'te-IN' : 'en-IN'}&gl=IN&ceid=IN:en`; }
+
+    /* ------------- Trending ------------- */
+    document.getElementById("trendEn").onclick = () => loadTrending("en");
+    document.getElementById("trendTe").onclick = () => loadTrending("te");
+
+    async function loadTrending(lang = "en") {
+      trendingBody.textContent = "Loading trending…";
+      try {
+        const res = await fetch(`${API_ARCHIVE}/trending?limit=12&lang=${encodeURIComponent(lang)}`, { credentials: "include" });
+        if (!res.ok) throw new Error("Trending failed");
+        const list = await res.json();
+        if (!Array.isArray(list) || !list.length) { trendingBody.innerHTML = `<div class="empty">No trending articles.</div>`; return; }
+        trendingBody.innerHTML = "";
+        list.forEach(it => {
+          const box = document.createElement("div");
+          box.className = "trend-item";
+          const tDiv = document.createElement("div"); tDiv.style.fontWeight = "700"; tDiv.textContent = it.title || it.titleText || "Untitled";
+          const meta = document.createElement("div"); meta.style.color = "var(--muted)"; meta.style.fontSize = "13px";
+          meta.textContent = `${it.source || it.pub || ""} · ${it.publishedAt ? new Date(it.publishedAt).toLocaleDateString() : ""}`;
+          const ctl = document.createElement("div"); ctl.style.marginTop = "8px";
+          const openBtn = document.createElement("button"); openBtn.className = "btn primary"; openBtn.textContent = "Open";
+          const openUrl = it.link || it.url || it.downloadUrl || buildSearchUrl(it.title || "", it.pub || "", lang);
+          openBtn.addEventListener("click", () => openAndTrack(it.id || "", openUrl));
+          ctl.appendChild(openBtn);
+          box.appendChild(tDiv); box.appendChild(meta); box.appendChild(ctl);
+          trendingBody.appendChild(box);
+        });
+      } catch (e) {
+        console.error(e);
+        trendingBody.innerHTML = `<div class="empty">Error loading trending.</div>`;
+      }
+    }
+
+    /* ------------- Upload (send tags array) ------------- */
+    async function uploadNews() {
+      const title = document.getElementById("upTitle").value.trim();
+      const pub = document.getElementById("upPub").value.trim();
+      const year = document.getElementById("upYear").value;
+      const url = document.getElementById("upUrl").value.trim();
+      const tagsCSV = document.getElementById("upTags").value.trim();
+      if (!title || !pub || !year || !url) { alert("Fill Title, Publication, Year, URL"); return; }
+      const tagsArray = tagsCSV ? tagsCSV.split(",").map(s => s.trim()).filter(Boolean) : [];
+      const payload = {
+        title,
+        source: pub,
+        publishedAt: (new Date(Number(year), 0, 1)).toISOString(),
+        link: url,
+        downloadUrl: url,
+        tags: tagsArray
+      };
+      try {
+        const res = await fetch(`${API_ARCHIVE}/upload`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json; charset=utf-8" },
+          body: JSON.stringify(payload),
+          credentials: "include"
+        });
+        const msgEl = document.getElementById("uploadMsg");
+        if (res.ok) {
+          msgEl.style.color = "green"; msgEl.textContent = "Uploaded ✓";
+          // try to parse returned id (if API returns the created object or id)
+          let createdId = null;
+          try {
+            const json = await res.clone().json().catch(() => null);
+            if (json) {
+              // common shapes: { id: ... } or returned resource
+              createdId = json.id || json._id || (json.data && json.data.id) || null;
+              // some APIs return the created object directly
+              if (!createdId && typeof json === 'object' && json.id) createdId = json.id;
+            }
+          } catch (_) { }
+          // If backend didn't return id, we can still store a local marker using a generated id to show Delete locally,
+          // but prefer backend id when available.
+          if (createdId) {
+            addLocalUploadedId(createdId);
+          } else {
+            // create a pseudo id to allow local delete UI (won't delete on server)
+            const pseudo = 'local-' + Date.now();
+            addLocalUploadedId(pseudo);
+          }
+          // refresh list for the publication (if they provided pub)
+          setTimeout(() => {
+            showPanel('discover');
+            renderPaperButtons();
+            if (pub) { selectPaper(pub, ''); } else { loadArticlesFor(null, true); }
+            refreshLocalUploads();
+          }, 700);
+        } else {
+          const txt = await res.text().catch(() => res.status);
+          msgEl.style.color = "crimson"; msgEl.textContent = "Upload failed: " + (txt || res.status);
+        }
+      } catch (e) {
+        console.error(e);
+        document.getElementById("uploadMsg").textContent = "Network error";
+      }
+    }
+
+    /* ------------- Local uploads UI ------------- */
+    function refreshLocalUploads() {
+      const arr = getLocalUploadedIds();
+      localUploadsList.innerHTML = "";
+      if (!arr.length) {
+        localUploadsList.innerHTML = '<div class="small-muted">No local uploads recorded.</div>';
+        return;
+      }
+      arr.forEach(id => {
+        const row = document.createElement("div");
+        row.className = "item";
+        const left = document.createElement("div");
+        left.textContent = String(id);
+        left.style.wordBreak = "break-all";
+        const right = document.createElement("div");
+        const delBtn = document.createElement("button");
+        delBtn.className = "btn danger";
+        delBtn.textContent = "Delete";
+        delBtn.addEventListener("click", () => {
+          const ok = confirm(`Delete local upload marker and attempt server delete for ID:\n\n${id}`);
+          if (!ok) return;
+          attemptDeleteWithConfirm(id, `ID: ${id}`);
+        });
+        right.appendChild(delBtn);
+        row.appendChild(left); row.appendChild(right);
+        localUploadsList.appendChild(row);
+      });
+    }
+
+    /* ------------- Saved rendering ------------- */
+    function renderSaved() {
+      const saved = JSON.parse(localStorage.getItem("savedNews") || "[]");
+      if (!saved.length) { savedListEl.textContent = "No saved items."; return; }
+      savedListEl.innerHTML = "";
+      saved.forEach(s => {
+        const box = document.createElement("div");
+        box.style.padding = "8px"; box.style.borderBottom = "1px solid #f0f2f4";
+        const strong = document.createElement("strong"); strong.textContent = s.title || "";
+        box.appendChild(strong);
+        const m = document.createElement("div"); m.style.color = "var(--muted)"; m.textContent = s.source || s.pub || "";
+        box.appendChild(m);
+        const ctl = document.createElement("div"); ctl.style.marginTop = "6px";
+        const openBtn = document.createElement("button"); openBtn.className = "btn primary"; openBtn.textContent = "Open";
+        openBtn.addEventListener("click", () => openAndTrack(s.id || "", s.link || s.url || ""));
+        const remBtn = document.createElement("button"); remBtn.className = "btn"; remBtn.textContent = "Remove";
+        remBtn.style.marginLeft = "8px";
+        remBtn.addEventListener("click", () => { removeSaved(s.id || ""); });
+        ctl.appendChild(openBtn); ctl.appendChild(remBtn);
+        box.appendChild(ctl);
+        savedListEl.appendChild(box);
+      });
+    }
+    function removeSaved(id) {
+      let saved = JSON.parse(localStorage.getItem("savedNews") || "[]");
+      saved = saved.filter(x => String(x.id) !== String(id));
+      localStorage.setItem("savedNews", JSON.stringify(saved));
+      renderSaved();
+    }
+
+    /* ------------- Helpers ------------- */
+    function escapeHtml(s) { return (s || "").toString().replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[m])); }
+    function searchWebFor(name) { const u = buildSearchUrl(name, "", currentLang); openAndTrack("", u); }
+    function showPopular() {
+      const popular = ["The Hindu", "Times of India", "Indian Express", "Eenadu", "Sakshi"];
+      const filtered = PAPERS.filter(p => popular.includes(p.name));
+      paperListEl.innerHTML = "";
+      filtered.forEach(p => {
+        const btn = document.createElement("div");
+        btn.className = "paper-btn";
+        btn.innerHTML = `<h4>${escapeHtml(p.name)}</h4><small>${p.lang === "te" ? "Telugu" : "English"}</small>`;
+        btn.addEventListener("click", () => selectPaper(p.name, p.lang));
+        paperListEl.appendChild(btn);
+      });
+    }
+
+    /* ------------- Boot ------------- */
+    function init() {
+      renderPaperButtons();
+      showPanel("discover");
+      updateSidebarStateOnResize();
+      refreshLocalUploads();
+    }
+    init();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Dashboard — Library</title>
+  <style>
+    :root {
+      --sidebar-bg: #2f3438;
+      --accent1: #ffb86b;
+      --accent2: #ff7b9c;
+      --muted: #6b6b6b;
+      --card: #ffffff;
+      --primary: #5b21b6;
+      --danger: #e24b4b;
+      --shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+      --radius: 14px;
+      --btn-active: linear-gradient(180deg, #ffd1a1, #ffb86b);
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #f0e6d3, #e9d6b0);
+      color: #111;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout */
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background: var(--sidebar-bg);
+      color: #fff;
+      padding: 22px 14px;
+      flex-shrink: 0;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      overflow: auto;
+    }
+
+    .main {
+      margin-left: 200px;
+      padding: 28px;
+      flex: 1;
+      min-height: 100vh;
+    }
+
+    /* Sidebar content */
+    .sidebar .title {
+      font-size: 22px;
+      color: #ff8b8b;
+      font-weight: 800;
+      margin-bottom: 18px;
+      line-height: 1.1;
+    }
+
+    .sidebar .btn {
+      display: block;
+      width: 100%;
+      padding: 12px 12px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      border: 0;
+      cursor: pointer;
+      font-weight: 700;
+      background: linear-gradient(180deg, var(--accent1), #d59a6b);
+      color: #2b1f1a;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+      text-align: left;
+      transition: all .15s;
+    }
+
+    .sidebar .btn.secondary {
+      background: #695859;
+      color: #ffd0b0;
+    }
+
+    .sidebar .btn.ghost {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .sidebar .logout {
+      margin-top: 20px;
+      background: var(--danger);
+      color: #fff;
+      border-radius: 18px;
+      padding: 10px;
+      font-size: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar small {
+      color: rgba(255, 255, 255, 0.6);
+      display: block;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    .sidebar .btn.active {
+      background: var(--btn-active);
+      color: #111;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18);
+    }
+
+    /* Header / top area in main */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .page-sub {
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    /* Panels */
+    .panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .panel h3 {
+      margin: 0 0 12px 0;
+      font-size: 20px;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .controls input,
+    .controls select {
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+      min-width: 120px;
+    }
+
+    .controls .spacer {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Table base */
+    .table-wrap {
+      width: 100%;
+      overflow: auto;
+      border-radius: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px;
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f0f0f0;
+      text-align: left;
+      vertical-align: middle;
+      font-size: 14px;
+    }
+
+    th {
+      background: linear-gradient(90deg, #f2c4ff, #ffd6ff);
+      font-weight: 800;
+      color: #111;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    td.actions {
+      text-align: right;
+      min-width: 150px;
+    }
+
+    .btn-small {
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 0;
+      cursor: pointer;
+      color: #fff;
+      background: var(--primary);
+      margin-left: 8px;
+      font-weight: 700;
+      box-shadow: 0 6px 10px rgba(91, 33, 182, 0.12);
+    }
+
+    .btn-small.ghost {
+      background: #fff;
+      color: #333;
+      border: 1px solid #ddd;
+      box-shadow: none;
+    }
+
+    .btn-small.warn {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .action-group {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .borrowed-compact th,
+    .borrowed-compact td {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Mobile: transform table rows into cards */
+    @media (max-width:720px) {
+      .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 12px;
+        overflow: auto;
+      }
+
+      .sidebar .title {
+        display: none;
+      }
+
+      .main {
+        margin-left: 0;
+        padding: 14px;
+      }
+
+      .table-wrap {
+        overflow: visible;
+      }
+
+      table {
+        display: block;
+        width: 100%;
+        min-width: unset;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        display: block;
+        border-radius: 10px;
+        border: 1px solid #eee;
+        margin-bottom: 10px;
+        padding: 12px;
+        background: #fff;
+        box-shadow: none;
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 8px;
+        border-bottom: 0;
+      }
+
+      td.key {
+        color: var(--muted);
+        width: 45%;
+        font-weight: 700;
+      }
+
+      td.value {
+        width: 55%;
+        text-align: right;
+        color: #111;
+      }
+
+      .actions-mobile {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        margin-top: 8px;
+      }
+
+      .controls input,
+      .controls select {
+        min-width: 110px;
+      }
+
+      .panel {
+        padding: 12px;
+      }
+
+      .sidebar .btn {
+        padding: 10px 8px;
+        min-width: 120px;
+        white-space: nowrap;
+      }
+    }
+
+    /* Tablet tweaks */
+    @media (min-width:721px) and (max-width:1024px) {
+
+      th,
+      td {
+        padding: 10px;
+        font-size: 14px;
+      }
+
+      .sidebar {
+        width: 180px;
+      }
+
+      .main {
+        margin-left: 180px;
+      }
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .inline {
+      display: inline-block;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: #f5f5f5;
+      padding: 6px 8px;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+
+    .search {
+      padding: 8px;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+      min-width: 220px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" aria-label="Admin sidebar">
+      <div class="title">Welcome Admin</div>
+
+      <button class="btn sidebar-btn" data-target="panelAdd" onclick="openAddBook(this)">Add / Edit Book</button>
+      <button class="btn secondary sidebar-btn" data-target="panelBooks"
+        onclick="loadAllBooks(); showBooks(this)">Refresh Books</button>
+      <button class="btn secondary sidebar-btn" data-target="panelBorrowed" onclick="showBorrowedList(this)">View
+        Borrowed List</button>
+      <button class="btn secondary sidebar-btn" data-target="panelUsers" onclick="showUsers(this)">View All
+        Users</button>
+
+      <small>Manage B.Tech, M.Tech & MBA catalogs</small>
+      <button class="logout" onclick="logout()">Logout</button>
+    </aside>
+
+    <main class="main" role="main">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Admin Dashboard</h1>
+          <div class="page-sub">Logged in as: <strong id="adminEmail">admin@limat.edu.in</strong></div>
+        </div>
+        <div class="muted">Program: <span id="currentProgram" class="pill">M.Tech / MBA</span></div>
+      </div>
+
+      <!-- ADD / EDIT BOOK PANEL -->
+      <section id="panelAdd" class="panel" style="display:none;">
+        <h3 id="addTitle">Add New Book</h3>
+        <form id="formBook" enctype="multipart/form-data">
+          <input type="hidden" id="editMode" value="false" />
+          <div class="controls">
+            <input id="bookId" name="id" type="number" placeholder="ID (auto if blank)" />
+            <input id="bookTitle" name="title" type="text" placeholder="Title" required style="flex:1;" />
+            <input id="bookAuthor" name="author" type="text" placeholder="Author" required style="min-width:160px" />
+          </div>
+
+          <div class="controls">
+            <select id="bookCategory" name="category" required>
+              <option value="B.Tech">B.Tech</option>
+              <option value="M.Tech">M.Tech</option>
+              <option value="MBA">MBA</option>
+            </select>
+            <input id="bookSemester" name="semester" type="number" placeholder="Sem" />
+            <input id="bookYear" name="year" type="number" placeholder="Year" />
+            <input id="bookAvailable" name="available" type="number" placeholder="Available" />
+            <input id="bookRack" name="rack" type="text" placeholder="Rack" />
+            <input id="bookPdf" name="pdf" type="file" accept="application/pdf" />
+          </div>
+
+          <div style="margin-top:12px;">
+            <button type="submit" class="btn btn-save">Save Book</button>
+            <button type="button" class="btn secondary" onclick="resetAddForm()">Reset</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- SHOW BOOKS (program selector) -->
+      <section id="panelBooks" class="panel" style="display:block;">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <h3 style="margin:0">All Books</h3>
+          <div class="controls" style="margin-left:auto;">
+            <label class="inline muted">Program:</label>
+            <select id="selectProgram" class="search">
+              <option value="B.Tech">B.Tech</option>
+              <option value="M.Tech">M.Tech</option>
+              <option value="MBA">MBA</option>
+            </select>
+            <input id="searchBooks" class="search" placeholder="Search title or author" />
+          </div>
+        </div>
+
+        <div class="table-wrap" style="margin-top:12px;">
+          <table id="booksTable" aria-describedby="Books table">
+            <thead>
+              <tr>
+                <th style="width:60px">ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th style="width:60px">Sem</th>
+                <th style="width:80px">Year</th>
+                <!-- category column intentionally removed -->
+                <th style="width:80px">Available</th>
+                <th style="width:80px">Rack</th>
+                <th style="width:170px" class="center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="booksTbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- BORROWED LIST (admin) -->
+      <section id="panelBorrowed" class="panel" style="display:none;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <h3 style="margin:0">Borrowed Records</h3>
+          <div style="margin-left:auto" class="controls">
+            <input id="filterEmail" placeholder="Filter by email" class="search" />
+            <button class="btn secondary" onclick="filterBorrowedByEmail()">Search</button>
+            <button class="btn secondary" onclick="loadBorrowed()">Reset</button>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="margin-top:12px;">
+          <table id="borrowedTable" class="borrowed-compact">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Title</th>
+                <th>Book Code</th>
+                <th>Borrowed</th>
+                <th>Expected Return</th>
+                <th>Status</th>
+                <th>Returned</th>
+                <th>Fine</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="borrowedTbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- USERS -->
+      <section id="panelUsers" class="panel" style="display:none;">
+        <h3>Users</h3>
+        <div class="table-wrap" style="margin-top:12px;">
+          <table>
+            <thead>
+              <tr>
+                <th>User Email</th>
+                <th>Total Borrows</th>
+              </tr>
+            </thead>
+            <tbody id="usersTbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="note">All admin API calls use the same endpoints as your backend. Adjust <code>API_BASE</code> in the
+        script if needed.</div>
+    </main>
+  </div>
+
+  <!-- Approve borrow modal -->
+  <div id="modalApprove"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;">
+    <div style="background:#fff;padding:18px;border-radius:12px;width:360px;box-shadow:var(--shadow);">
+      <h3 style="margin-top:0">Approve Borrow</h3>
+      <div style="margin-bottom:8px;">Enter unique book code to assign to this borrow:</div>
+      <input id="approveBookCode" placeholder="Book Code"
+        style="width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-bottom:12px;" />
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button onclick="closeApproveModal()" class="btn ghost">Cancel</button>
+        <button id="btnApproveConfirm" class="btn">Approve</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approve return modal -->
+  <div id="modalReturn"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;">
+    <div style="background:#fff;padding:18px;border-radius:12px;width:360px;box-shadow:var(--shadow);">
+      <h3 style="margin-top:0">Approve Return</h3>
+      <div style="margin-bottom:8px;">Mark return as approved and indicate if fine was paid.</div>
+      <label style="display:block;margin-bottom:8px;"><input id="returnFinePaid" type="checkbox" /> Fine paid</label>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button onclick="closeReturnModal()" class="btn ghost">Cancel</button>
+        <button id="btnReturnConfirm" class="btn">Approve Return</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ========= CONFIG ========= */
+    const API_BASE = 'http://localhost:8083/api'; // adjust if needed
+    const adminEmail = localStorage.getItem('email') || 'admin@limat.edu.in';
+    const adminRole = localStorage.getItem('role') || 'admin';
+    document.getElementById('adminEmail').textContent = adminEmail;
+
+    /* ========= STATE ========= */
+    let allBooks = [];
+    let borrowedList = [];
+    let approvingBorrowId = null;
+    let approvingReturnId = null;
+
+    /* ========= UTILS ========= */
+    function escapeHtml(s) { if (!s) return ''; return String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;'); }
+    function activateSidebar(buttonEl) {
+      document.querySelectorAll('.sidebar .btn').forEach(b => b.classList.remove('active'));
+      if (buttonEl) buttonEl.classList.add('active');
+    }
+
+    /* ========= NAV HELPERS ========= */
+    function resetPanels() { document.getElementById('panelAdd').style.display = 'none'; document.getElementById('panelBooks').style.display = 'none'; document.getElementById('panelBorrowed').style.display = 'none'; document.getElementById('panelUsers').style.display = 'none'; }
+    function openAddBook(btn) { resetPanels(); document.getElementById('panelAdd').style.display = 'block'; document.getElementById('addTitle').textContent = 'Add / Edit Book'; activateSidebar(btn || document.querySelector('.sidebar .btn[data-target="panelAdd"]')); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function showBooks(btn) { resetPanels(); document.getElementById('panelBooks').style.display = 'block'; activateSidebar(btn || document.querySelector('.sidebar .btn[data-target="panelBooks"]')); renderProgramTable(); }
+    function showBorrowedList(btn) { resetPanels(); document.getElementById('panelBorrowed').style.display = 'block'; activateSidebar(btn || document.querySelector('.sidebar .btn[data-target="panelBorrowed"]')); loadBorrowed(); }
+    function showUsers(btn) { resetPanels(); document.getElementById('panelUsers').style.display = 'block'; activateSidebar(btn || document.querySelector('.sidebar .btn[data-target="panelUsers"]')); loadUsers(); }
+
+    /* ========= DEBOUNCE ========= */
+    function debounceFn(fn, wait = 200) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), wait); }; }
+    const debouncedRender = debounceFn(renderProgramTable, 180);
+    document.getElementById('searchBooks').addEventListener('input', debouncedRender);
+    document.getElementById('selectProgram').addEventListener('change', renderProgramTable);
+
+    /* ========= API CALLS ========= */
+    async function loadAllBooks() {
+      try {
+        const res = await fetch(`${API_BASE}/books/all`);
+        if (!res.ok) throw new Error('Failed to fetch books');
+        allBooks = await res.json() || [];
+        renderProgramTable();
+      } catch (e) {
+        console.error(e);
+        alert('Error loading books');
+      }
+    }
+
+    /* Robust program/category matching:
+       - prefer explicit category field equality
+       - check 'program' property if available
+       - handle case-insensitive variants and missing category
+    */
+    function programMatches(book, selectedProgram) {
+      if (!book) return false;
+      const want = (selectedProgram || '').toString().toLowerCase().replace(/\s+/g, '').replace('.', ''); // e.g. "mtech","btech","mba"
+      // check explicit fields
+      const cat = (book.category || book.program || '').toString().toLowerCase().replace(/\s+/g, '').replace('.', '');
+      if (cat) {
+        if (cat === want) return true;
+        if (cat.includes(want)) return true;
+        // sometimes stored as "B.Tech" or "B.Tech - CSE", so check includes
+        if (cat.indexOf(want) !== -1) return true;
+      }
+      // fallback: if book has no category, try to infer from title/metadata (best-effort)
+      // e.g., for M.Tech books some systems put "MTech" in subject or tags. We'll also support a manual override.
+      // If nothing matches, return false.
+      return false;
+    }
+
+    /* Render books for selected program with robust matching */
+    function renderProgramTable() {
+      const selectedProgram = document.getElementById('selectProgram').value || 'B.Tech';
+      document.getElementById('currentProgram').textContent = selectedProgram;
+      const q = (document.getElementById('searchBooks').value || '').trim().toLowerCase();
+      const filtered = (allBooks || []).filter(b => {
+        if (!programMatches(b, selectedProgram)) return false;
+        if (!q) return true;
+        const title = (b.title || '').toLowerCase();
+        const author = (b.author || '').toLowerCase();
+        return title.includes(q) || author.includes(q);
+      });
+
+      const tbody = document.getElementById('booksTbody');
+      tbody.innerHTML = '';
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="center muted">No books found</td></tr>`;
+        return;
+      }
+      filtered.forEach(b => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+      <td>${b.id}</td>
+      <td>${escapeHtml(b.title)}</td>
+      <td>${escapeHtml(b.author)}</td>
+      <td>${b.semester ?? '-'}</td>
+      <td>${b.year ?? '-'}</td>
+      <td>${b.available ?? 0}</td>
+      <td>${b.rack ?? '-'}</td>
+      <td class="actions">
+        <div class="action-group">
+          <button class="btn-small" onclick="viewPdf(${b.id})">View</button>
+          <button class="btn-small" onclick="editBook(${b.id})">Edit</button>
+          <button class="btn-small ghost" onclick="deleteBook(${b.id})">Delete</button>
+        </div>
+      </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* view, edit, delete */
+    function viewPdf(id) { window.open(`${API_BASE}/books/pdf/${id}`, '_blank'); }
+
+    async function editBook(id) {
+      try {
+        const res = await fetch(`${API_BASE}/books/${id}`);
+        if (!res.ok) throw new Error('book not found');
+        const b = await res.json();
+        openAddBook();
+        document.getElementById('bookId').value = b.id || '';
+        document.getElementById('bookTitle').value = b.title || '';
+        document.getElementById('bookAuthor').value = b.author || '';
+        document.getElementById('bookCategory').value = b.category || 'B.Tech';
+        document.getElementById('bookSemester').value = b.semester || '';
+        document.getElementById('bookYear').value = b.year || '';
+        document.getElementById('bookAvailable').value = b.available || 0;
+        document.getElementById('bookRack').value = b.rack || '';
+        document.getElementById('addTitle').textContent = `Edit Book #${b.id}`;
+        document.getElementById('editMode').value = 'true';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (e) { console.error(e); alert('Cannot load book for edit'); }
+    }
+
+    async function deleteBook(id) {
+      if (!confirm('Delete this book?')) return;
+      try {
+        const res = await fetch(`${API_BASE}/books/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Delete failed');
+        await loadAllBooks();
+      } catch (e) { console.error(e); alert('Delete failed'); }
+    }
+
+    /* SUBMIT add/edit book */
+    document.getElementById('formBook').addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      try {
+        const form = new FormData(ev.target);
+        const edit = document.getElementById('editMode').value === 'true';
+        let url = `${API_BASE}/books/add`, method = 'POST';
+        if (edit && form.get('id')) { url = `${API_BASE}/books/${form.get('id')}`; method = 'PUT'; }
+        const res = await fetch(url, { method, body: form });
+        const txt = await res.text();
+        if (!res.ok) throw new Error(txt || 'Save failed');
+        alert(txt || 'Saved');
+        resetAddForm();
+        await loadAllBooks();      // refresh global list
+        showBooks();               // show books panel (keeps admin in sync)
+      } catch (e) { console.error(e); alert('Save failed: ' + (e.message || e)); }
+    });
+
+    function resetAddForm() {
+      document.getElementById('formBook').reset();
+      document.getElementById('editMode').value = 'false';
+      document.getElementById('addTitle').textContent = 'Add / Edit Book';
+    }
+
+    /* BORROWED LIST */
+    async function loadBorrowed() {
+      try {
+        const res = await fetch(`${API_BASE}/admin/borrowed-list`);
+        if (!res.ok) throw new Error('Failed to load borrowed records');
+        borrowedList = await res.json() || [];
+        renderBorrowed();
+      } catch (e) { console.error(e); alert('Failed to load borrowed records'); }
+    }
+
+    /* renders borrowed table without category column */
+    function renderBorrowed() {
+      const tbody = document.getElementById('borrowedTbody');
+      tbody.innerHTML = '';
+      if (!borrowedList || !borrowedList.length) {
+        tbody.innerHTML = `<tr><td colspan="10" class="center muted">No borrowed records</td></tr>`;
+        return;
+      }
+      borrowedList.forEach(b => {
+        const returned = b.returned ? 'Yes' : 'No';
+        const fine = b.fineAmount ?? 0;
+        let actionHTML = '';
+        if (b.status === 'PENDING') actionHTML = `<button class="btn-small" onclick="openApproveModal(${b.id})">Approve</button>`;
+        else if (!b.returned && (b.status === 'APPROVED' || b.status === 'PENDING_RETURN')) actionHTML = `<button class="btn-small" onclick="openReturnModal(${b.id})">Approve Return</button>`;
+        else actionHTML = '-';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+      <td>${b.id}</td>
+      <td>${escapeHtml(b.userEmail || '-')}</td>
+      <td>${escapeHtml(b.bookTitle || '-')}</td>
+      <td>${escapeHtml(b.bookCode || '-')}</td>
+      <td>${b.borrowDate || '-'}</td>
+      <td>${b.expectedReturnDate || '-'}</td>
+      <td>${b.status || '-'}</td>
+      <td>${returned}</td>
+      <td>₹${fine}</td>
+      <td class="actions">${actionHTML}</td>
+    `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* filter borrowed by email */
+    async function filterBorrowedByEmail() {
+      const q = (document.getElementById('filterEmail').value || '').trim();
+      if (!q) return loadBorrowed();
+      try {
+        const res = await fetch(`${API_BASE}/admin/borrowed-list/by-email?email=${encodeURIComponent(q)}`);
+        if (!res.ok) throw new Error('Search failed');
+        borrowedList = await res.json() || [];
+        renderBorrowed();
+      } catch (e) { console.error(e); alert('Search failed'); }
+    }
+
+    /* Approve borrow modal flows */
+    function openApproveModal(borrowId) {
+      approvingBorrowId = borrowId;
+      document.getElementById('approveBookCode').value = '';
+      document.getElementById('modalApprove').style.display = 'flex';
+      document.getElementById('approveBookCode').focus();
+    }
+    function closeApproveModal() { approvingBorrowId = null; document.getElementById('modalApprove').style.display = 'none'; }
+
+    document.getElementById('btnApproveConfirm').addEventListener('click', async () => {
+      const code = document.getElementById('approveBookCode').value.trim();
+      if (!code) return alert('Book code required');
+      try {
+        const res = await fetch(`${API_BASE}/admin/approve/${approvingBorrowId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ bookCode: code }) });
+        const j = await res.json();
+        if (!res.ok) throw new Error(j.message || 'Approve failed');
+        alert(j.message || 'Approved');
+        closeApproveModal();
+        await loadAllBooks(); await loadBorrowed();
+      } catch (e) { console.error(e); alert('Approve failed: ' + (e.message || e)); }
+    });
+
+    /* Approve return modal flows */
+    function openReturnModal(borrowId) {
+      approvingReturnId = borrowId;
+      document.getElementById('returnFinePaid').checked = false;
+      document.getElementById('modalReturn').style.display = 'flex';
+    }
+    function closeReturnModal() { approvingReturnId = null; document.getElementById('modalReturn').style.display = 'none'; }
+
+    document.getElementById('btnReturnConfirm').addEventListener('click', async () => {
+      const finePaid = document.getElementById('returnFinePaid').checked;
+      try {
+        const res = await fetch(`${API_BASE}/admin/approve-return/${approvingReturnId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ finePaid }) });
+        const j = await res.json();
+        if (!res.ok) throw new Error(j.message || 'Approve return failed');
+        // optionally call send no-due
+        try { await fetch(`${API_BASE}/admin/send-no-due/${approvingReturnId}`, { method: 'POST' }); } catch (e) { console.warn('no-due email failed', e); }
+        alert(j.message || 'Return approved');
+        closeReturnModal();
+        await loadBorrowed(); await loadAllBooks();
+      } catch (e) { console.error(e); alert('Approve return failed: ' + (e.message || e)); }
+    });
+
+    /* USERS */
+    async function loadUsers() {
+      try {
+        // reuse borrowed list to derive users if no dedicated endpoint
+        const res = await fetch(`${API_BASE}/borrow/all-borrowed`);
+        if (!res.ok) throw new Error('Failed');
+        const arr = await res.json() || [];
+        const map = {};
+        arr.forEach(b => { const u = b.userEmail || 'unknown'; map[u] = (map[u] || 0) + 1; });
+        const tbody = document.getElementById('usersTbody');
+        tbody.innerHTML = '';
+        if (!Object.keys(map).length) { tbody.innerHTML = '<tr><td colspan="2">No users</td></tr>'; return; }
+        Object.entries(map).forEach(([u, c]) => {
+          const tr = document.createElement('tr'); tr.innerHTML = `<td>${escapeHtml(u)}</td><td>${c}</td>`; tbody.appendChild(tr);
+        });
+      } catch (e) { console.error(e); alert('Failed to load users'); }
+    }
+
+    /* INIT and helpers */
+    function logout() { localStorage.clear(); window.location.href = '/'; }
+
+    window.onload = function () {
+      if (adminRole !== 'admin') { /* optionally redirect or notify */ }
+      document.getElementById('selectProgram').value = 'B.Tech';
+      document.getElementById('adminEmail').textContent = adminEmail;
+      // activate first sidebar btn visually
+      const firstBtn = document.querySelector('.sidebar .btn');
+      if (firstBtn) activateSidebar(firstBtn);
+      // load data
+      loadAllBooks();
+      showBooks(firstBtn);
+    };
+
+    /* NOTE about removing all database entries:
+       If you truly want to wipe all books, you need a backend endpoint (DELETE /api/books/all or similar).
+       I did NOT include a destructive endpoint here to avoid accidental data loss.
+    */
+  </script>
+</body>
+
+</html>

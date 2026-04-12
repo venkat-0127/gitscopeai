@@ -1,0 +1,1938 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Dashboard — Library</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <style>
+    :root {
+      --sidebar-bg: #2f3438;
+      --accent1: #ffb86b;
+      --muted: #6b6b6b;
+      --card: #ffffff;
+      --primary: #5b21b6;
+      --danger: #e24b4b;
+      --shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+      --radius: 14px;
+      --btn-active: linear-gradient(180deg, #ffd1a1, #ffb86b);
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #f0e6d3, #e9d6b0);
+      color: #111;
+      -webkit-font-smoothing: antialiased
+    }
+
+    .app {
+      display: flex;
+      min-height: 100vh
+    }
+
+    .sidebar {
+      width: 220px;
+      background: var(--sidebar-bg);
+      color: #fff;
+      padding: 22px 14px;
+      flex-shrink: 0;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      overflow: auto;
+      transform: translateX(0);
+      transition: transform .25s ease;
+      z-index: 30
+    }
+
+    .sidebar.show {
+      transform: translateX(0)
+    }
+
+    .sidebar.hidden {
+      transform: translateX(-100%)
+    }
+
+    .main {
+      margin-left: 220px;
+      padding: 28px;
+      flex: 1;
+      min-height: 100vh
+    }
+
+    .sidebar .title {
+      font-size: 22px;
+      color: #ff8b8b;
+      font-weight: 800;
+      margin-bottom: 18px;
+      line-height: 1.1
+    }
+
+    .sidebar .btn {
+      display: block;
+      width: 100%;
+      padding: 12px 12px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      border: 0;
+      cursor: pointer;
+      font-weight: 700;
+      background: linear-gradient(180deg, var(--accent1), #d59a6b);
+      color: #2b1f1a;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, .12);
+      text-align: left;
+      transition: all .15s
+    }
+
+    .sidebar .btn.secondary {
+      background: #695859;
+      color: #ffd0b0
+    }
+
+    .sidebar .btn.ghost {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, .08);
+      color: #fff
+    }
+
+    .sidebar .logout {
+      margin-top: 20px;
+      background: var(--danger);
+      color: #fff;
+      border-radius: 18px;
+      padding: 10px;
+      font-size: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, .2)
+    }
+
+    .sidebar small {
+      color: rgba(255, 255, 255, .6);
+      display: block;
+      margin-top: 12px;
+      font-size: 13px
+    }
+
+    .sidebar .btn.active {
+      background: var(--btn-active);
+      color: #111;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, .18)
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 18px
+    }
+
+    .page-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 28px;
+      font-weight: 800;
+      margin: 0
+    }
+
+    .hamburger {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 0;
+      cursor: pointer;
+      background: #fff;
+      box-shadow: var(--shadow)
+    }
+
+    .page-sub {
+      color: var(--muted);
+      margin-top: 8px
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .45);
+      z-index: 25
+    }
+
+    .overlay.show {
+      display: block
+    }
+
+    .panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+      overflow: hidden
+    }
+
+    .panel h3 {
+      margin: 0 0 12px 0;
+      font-size: 20px
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px
+    }
+
+    .controls input,
+    .controls select {
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+      min-width: 120px
+    }
+
+    .controls .spacer {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow: auto;
+      border-radius: 10px
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f0f0f0;
+      text-align: left;
+      vertical-align: middle;
+      font-size: 14px
+    }
+
+    th {
+      background: linear-gradient(90deg, #f2c4ff, #ffd6ff);
+      font-weight: 800;
+      color: #111;
+      position: sticky;
+      top: 0;
+      z-index: 2
+    }
+
+    td.actions {
+      text-align: right;
+      min-width: 150px
+    }
+
+    .btn-small {
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 0;
+      cursor: pointer;
+      color: #fff;
+      background: var(--primary);
+      margin-left: 8px;
+      font-weight: 700;
+      box-shadow: 0 6px 10px rgba(91, 33, 182, .12)
+    }
+
+    .btn-small.ghost {
+      background: #fff;
+      color: #333;
+      border: 1px solid #ddd;
+      box-shadow: none
+    }
+
+    .btn-small.warn {
+      background: var(--danger);
+      color: #fff
+    }
+
+    .action-group {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center
+    }
+
+    .pill {
+      display: inline-block;
+      background: #f6f6f6;
+      border: 1px solid #e6e6e6;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      margin-top: 6px
+    }
+
+    .borrowed-compact th,
+    .borrowed-compact td {
+      padding: 8px 10px;
+      font-size: 13px
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .inline {
+      display: inline-block
+    }
+
+    .center {
+      text-align: center
+    }
+
+    .search {
+      padding: 8px;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+      min-width: 220px
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: #eef;
+      border: 1px solid #dde;
+      color: #334;
+      font-size: 12px
+    }
+
+    @media (max-width:920px) {
+      .hamburger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center
+      }
+
+      .sidebar {
+        transform: translateX(-100%);
+        position: fixed;
+        left: 0
+      }
+
+      .sidebar.show {
+        transform: translateX(0)
+      }
+
+      .main {
+        margin-left: 0;
+        padding: 16px
+      }
+
+      .table-wrap {
+        overflow: visible
+      }
+
+      table {
+        display: block;
+        width: 100%;
+        min-width: unset
+      }
+
+      thead {
+        display: none
+      }
+
+      tr {
+        display: block;
+        border-radius: 10px;
+        border: 1px solid #eee;
+        margin-bottom: 10px;
+        padding: 12px;
+        background: #fff
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 8px;
+        border-bottom: 0
+      }
+
+      .controls input,
+      .controls select {
+        min-width: 110px
+      }
+
+      .panel {
+        padding: 12px
+      }
+
+      .sidebar .btn {
+        padding: 10px 8px;
+        min-width: 120px;
+        white-space: nowrap
+      }
+    }
+
+    @media (min-width:921px) and (max-width:1180px) {
+      .sidebar {
+        width: 200px
+      }
+
+      .main {
+        margin-left: 200px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div id="overlay" class="overlay" onclick="toggleSidebar(false)"></div>
+
+    <aside id="sidebar" class="sidebar" aria-label="Admin sidebar">
+      <div class="title">Welcome Admin</div>
+
+      <!-- keep class btn for JS selection -->
+      <button class="btn sidebar-btn" data-target="panelBooks" onclick="loadAllBooks(); showBooks(this)">All / Edit
+        Books</button>
+      <button class="btn secondary sidebar-btn" data-target="panelAdd" onclick="openAddBook(this)">Add Book</button>
+      <button class="btn secondary sidebar-btn" data-target="panelBulk" onclick="showBulk(this)">Bulk Upload</button>
+      <button class="btn secondary sidebar-btn" data-target="panelBorrowed" onclick="showBorrowedList(this)">Borrowed
+        List</button>
+      <button class="btn secondary sidebar-btn" data-target="panelPayments"
+        onclick="showPayments(this)">Payments</button>
+      <button class="btn secondary sidebar-btn" data-target="panelLibrarians"
+        onclick="showLibrarians(this)">Librarians</button>
+      <button class="btn secondary sidebar-btn" data-target="panelUsers" onclick="showUsers(this)">All Users</button>
+
+      <small>Manage B.Tech, M.Tech & MBA catalogs</small>
+      <button class="logout" onclick="logout()">Logout</button>
+    </aside>
+
+    <main class="main" role="main">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">
+            <button class="hamburger" aria-label="Open menu" onclick="toggleSidebar(true)">☰</button>
+            Admin Dashboard
+          </h1>
+          <div class="page-sub">Logged in as: <strong id="adminEmail">admin@limat.edu.in</strong></div>
+        </div>
+        <div class="muted">Program: <span id="currentProgram" class="tag">B.Tech</span></div>
+      </div>
+
+      <!-- ADD / EDIT BOOK -->
+      <section id="panelAdd" class="panel" style="display:none;">
+        <h3 id="addTitle">Add / Edit Book</h3>
+        <form id="formBook" enctype="multipart/form-data">
+          <input type="hidden" id="editMode" value="false" />
+          <div class="controls">
+            <input id="bookId" name="id" type="number" placeholder="ID (auto if blank)" />
+            <input id="bookTitle" name="title" type="text" placeholder="Title" required style="flex:1;" />
+            <input id="bookAuthor" name="author" type="text" placeholder="Author" required style="min-width:160px" />
+          </div>
+          <div class="controls">
+            <select id="bookCategory" name="category" required>
+              <option value="B.Tech">B.Tech</option>
+              <option value="M.Tech">M.Tech</option>
+              <option value="MBA">MBA</option>
+            </select>
+            <input type="hidden" id="bookSemesterHidden" name="semester" value="0" />
+            <input id="bookBranch" name="branch" type="text" placeholder="Branch" />
+            <input id="bookYear" name="year" type="number" placeholder="Year" />
+            <input id="bookAvailable" name="available" type="number" placeholder="Available" />
+            <input id="bookRack" name="rack" type="text" placeholder="Rack" />
+            <input id="bookPdf" name="pdf" type="file" accept="application/pdf" />
+          </div>
+          <div style="margin-top:12px;">
+            <button type="submit" class="btn btn-save">Save Book</button>
+            <button type="button" class="btn secondary" onclick="resetAddForm()">Reset</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- BULK UPLOAD -->
+      <section id="panelBulk" class="panel" style="display:none;">
+        <h3>Bulk Upload Books</h3>
+        <div class="controls">
+          <label>Upload Program:</label>
+          <select id="bulkProgram">
+            <option value="AUTO">Auto (use CSV category/branch)</option>
+            <option value="B.Tech">B.Tech</option>
+            <option value="M.Tech">M.Tech</option>
+            <option value="MBA">MBA</option>
+          </select>
+        </div>
+
+        <div class="controls" style="margin-top:8px;">
+          <input id="bulkFile" type="file" accept=".csv,.xlsx,.xls" />
+          <button id="uploadBtn" class="btn">Upload</button>
+          <button class="btn secondary" onclick="downloadTemplate('csv')">Template CSV</button>
+          <button class="btn secondary" onclick="downloadTemplate('xlsx')">Template XLSX</button>
+        </div>
+
+        <div id="bulkFilename" class="note" style="margin-top:6px;"></div>
+        <span class="note">Columns: title,author,branch,year,available,rack,category,pdfPath (optional: id)</span>
+        <div id="bulkResult" class="note" style="margin-top:10px;"></div>
+        <div id="bulkErrors" class="note"></div>
+      </section>
+
+      <!-- SHOW BOOKS -->
+      <section id="panelBooks" class="panel">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <h3 style="margin:0">All Books</h3>
+          <div class="controls" style="margin-left:auto;">
+            <label class="inline muted">Program:</label>
+            <select id="selectProgram" class="search">
+              <option value="B.Tech">B.Tech</option>
+              <option value="M.Tech">M.Tech</option>
+              <option value="MBA">MBA</option>
+            </select>
+            <input id="searchBooks" class="search" placeholder="Search title or author" />
+          </div>
+        </div>
+
+        <div class="table-wrap" style="margin-top:12px;">
+          <table id="booksTable" aria-describedby="Books table">
+            <thead>
+              <tr>
+                <th style="width:60px">ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th style="width:80px">Branch</th>
+                <th style="width:80px">Year</th>
+                <th style="width:80px">Available</th>
+                <th style="width:80px">Rack</th>
+                <th style="width:170px" class="center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="booksTbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- BORROWED -->
+      <section id="panelBorrowed" class="panel" style="display:none;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <h3 style="margin:0">Borrowed Records</h3>
+          <div style="margin-left:auto" class="controls">
+            <select id="borrowProgram" class="search">
+              <option value="">All Programs</option>
+              <option value="BTECH">B.Tech</option>
+              <option value="MTECH">M.Tech</option>
+              <option value="MBA">MBA</option>
+            </select>
+            <input id="filterEmail" placeholder="Filter by email" class="search" />
+            <button class="btn secondary" onclick="loadBorrowed()">Search</button>
+            <button class="btn secondary" onclick="resetBorrowedFilters()">Reset</button>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="margin-top:12px;">
+          <table id="borrowedTable" class="borrowed-compact">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Title</th>
+                <th>Book Code</th>
+                <th>Borrowed</th>
+                <th>Expected Return</th>
+                <th>Status</th>
+                <th>Returned</th>
+                <th>Fine</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="borrowedTbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PAYMENTS -->
+      <section id="panelPayments" class="panel" style="display:none;">
+        <h3>Payments</h3>
+        <div class="controls">
+          <input id="payBorrowId" type="number" placeholder="Borrow ID" />
+          <button class="btn" onclick="lookupPayment()">Lookup</button>
+          <span class="note">Use the Borrow ID from the list</span>
+        </div>
+
+        <div id="payCard" class="panel" style="display:none;padding:12px;">
+          <div id="payInfo" class="note" style="margin-bottom:10px;"></div>
+
+          <div class="controls">
+            <button id="btnRzpPay" class="btn">Pay with Razorpay</button>
+            <button id="btnCashPay" class="btn secondary">Mark Cash Paid</button>
+            <span class="note">Fine is collected only for <b>due</b>.</span>
+          </div>
+
+          <div style="border-top:1px dashed #eee;margin:10px 0"></div>
+
+          <div class="controls">
+            <button class="btn btn-small warn" onclick="openLostModal()">Mark Lost</button>
+            <span class="note">Lost will <b>add</b> amount to current due.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- LIBRARIANS -->
+      <section id="panelLibrarians" class="panel" style="display:none;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <h3 style="margin:0">Librarians</h3>
+          <div class="controls" style="margin-left:auto;">
+            <input id="libUsername" placeholder="Username" />
+            <input id="libPassword" type="password" placeholder="Password" />
+            <button class="btn" onclick="addLibrarian()">Add Librarian</button>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="margin-top:12px;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:80px;">ID</th>
+                <th>Username</th>
+                <th style="width:80px;">Active</th>
+                <th style="width:220px;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="libsTbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- USERS -->
+      <section id="panelUsers" class="panel" style="display:none;">
+        <h3>Users</h3>
+        <div class="table-wrap" style="margin-top:12px;">
+          <table>
+            <thead>
+              <tr>
+                <th>User Email</th>
+                <th>Total Borrows</th>
+              </tr>
+            </thead>
+            <tbody id="usersTbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="note">All admin API calls use the same endpoints as your backend. Adjust <code>API_BASE</code> in the
+        script if needed.</div>
+    </main>
+  </div>
+
+  <!-- Approve modal -->
+  <div id="modalApprove"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center;z-index:40;">
+    <div style="background:#fff;padding:18px;border-radius:12px;width:360px;box-shadow:var(--shadow);">
+      <h3 style="margin-top:0">Approve Borrow</h3>
+      <div>Enter book code to assign:</div>
+      <input id="approveBookCode" placeholder="Book Code"
+        style="width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin:12px 0;" />
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button onclick="closeApproveModal()" class="btn secondary">Cancel</button>
+        <button id="btnApproveConfirm" class="btn">Approve</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Return modal -->
+  <div id="modalReturn"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center;z-index:40;">
+    <div style="background:#fff;padding:18px;border-radius:12px;width:360px;box-shadow:var(--shadow);">
+      <h3 style="margin-top:0">Approve Return</h3>
+      <div class="note">Approve return; backend validates fine payment.</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;">
+        <button onclick="closeReturnModal()" class="btn secondary">Cancel</button>
+        <button id="btnReturnConfirm" class="btn">Approve Return</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lost modal -->
+  <div id="modalLost"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center;z-index:40;">
+    <div style="background:#fff;padding:18px;border-radius:12px;width:380px;box-shadow:var(--shadow);">
+      <h3 style="margin-top:0">Mark Book as Lost</h3>
+      <div class="note">Enter replacement/penalty amount (₹):</div>
+      <input id="lostAmount" type="number" min="0" placeholder="₹ Amount"
+        style="width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin:12px 0;" />
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+        <button class="btn secondary" onclick="closeLostModal()">Cancel</button>
+        <button class="btn" onclick="lostAddOnly()">Add Only</button>
+        <button class="btn" onclick="lostAddCash()">Add & Cash Paid</button>
+        <button class="btn warn" onclick="lostAddRzp()">Add & Razorpay</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ================== CONFIG & HELPERS ================== */
+    const API_BASE = '/api'; // same origin, backend mounted under /api
+
+    const adminEmailVal = localStorage.getItem('email') || 'admin@limat.edu.in';
+    const adminRole = localStorage.getItem('role') || 'admin';
+    function applyRoleVisibility() {
+      const role = (adminRole || '').toUpperCase();
+
+      // Sidebar button for Librarians
+      const btnLibrarians = document.querySelector(
+        'button.sidebar-btn[data-target="panelLibrarians"]'
+      );
+      // The Librarians panel section
+      const panelLibrarians = document.getElementById('panelLibrarians');
+
+      // Only SUPER_ADMIN can see & use Librarians panel
+      if (role !== 'SUPER_ADMIN') {
+        if (btnLibrarians) btnLibrarians.style.display = 'none';
+        if (panelLibrarians) panelLibrarians.style.display = 'none';
+      }
+
+      // (Optional) If you also want to hide “Payments” or “All Users”
+      // for librarians, you can extend like this:
+
+      // if (role === 'LIBRARIAN') {
+      //   const btnPayments = document.querySelector('button.sidebar-btn[data-target="panelPayments"]');
+      //   const btnUsers = document.querySelector('button.sidebar-btn[data-target="panelUsers"]');
+      //   const panelPayments = document.getElementById('panelPayments');
+      //   const panelUsers = document.getElementById('panelUsers');
+      //
+      //   if (btnPayments) btnPayments.style.display = 'none';
+      //   if (panelPayments) panelPayments.style.display = 'none';
+      //   if (btnUsers) btnUsers.style.display = 'none';
+      //   if (panelUsers) panelUsers.style.display = 'none';
+      // }
+    }
+    const ael = document.getElementById('adminEmail');
+    if (ael) ael.textContent = adminEmailVal;
+
+    let allBooks = [];
+    let borrowedList = [];
+    let approvingBorrowId = null;
+    let approvingReturnId = null;
+
+    // For payments / lost
+    let paymentBorrow = null;
+
+    function escapeHtml(s) {
+      if (!s) return '';
+      return String(s)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;');
+    }
+
+    function toast(s) {
+      alert(String(s));
+    }
+
+    function debounceFn(fn, wait = 200) {
+      let t;
+      return (...a) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...a), wait);
+      };
+    }
+
+    async function fetchWithAutoParse(url, options = {}) {
+      try {
+        const res = await fetch(url, options);
+        const ct = res.headers.get('content-type') || '';
+        let data = null;
+        if (ct.includes('application/json')) {
+          try {
+            data = await res.json();
+          } catch (e) {
+            data = null;
+          }
+        } else {
+          try {
+            data = await res.text();
+          } catch (e) {
+            data = null;
+          }
+        }
+        return { ok: res.ok, status: res.status, data, headers: res.headers };
+      } catch (err) {
+        console.error('Network error', url, err);
+        return { ok: false, status: 0, data: String(err), error: err };
+      }
+    }
+
+    /* ================== DOM SHORTCUTS ================== */
+    const searchBooks =
+      document.getElementById('searchBooks') || {
+        addEventListener: () => { },
+        value: ''
+      };
+    const selectProgram =
+      document.getElementById('selectProgram') || {
+        addEventListener: () => { },
+        value: 'B.Tech'
+      };
+    const booksTbody =
+      document.getElementById('booksTbody') || {
+        innerHTML: '',
+        appendChild: () => { }
+      };
+    const currentProgram =
+      document.getElementById('currentProgram') || { textContent: '' };
+
+    const debouncedRender = debounceFn(renderProgramTable, 180);
+    try {
+      searchBooks.addEventListener('input', debouncedRender);
+    } catch (e) { }
+    try {
+      selectProgram.addEventListener('change', renderProgramTable);
+    } catch (e) { }
+
+    /* ================== SIDEBAR & PANELS ================== */
+    function toggleSidebar(open) {
+      const sb = document.getElementById('sidebar');
+      const ov = document.getElementById('overlay');
+      if (!sb || !ov) return;
+      if (open === true) {
+        sb.classList.add('show');
+        ov.classList.add('show');
+      } else if (open === false) {
+        sb.classList.remove('show');
+        ov.classList.remove('show');
+      } else {
+        sb.classList.toggle('show');
+        ov.classList.toggle('show');
+      }
+    }
+
+    function activateSidebar(btn) {
+      document
+        .querySelectorAll('.sidebar .btn')
+        .forEach((b) => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      const sb = document.getElementById('sidebar');
+      const ov = document.getElementById('overlay');
+      if (sb && window.innerWidth <= 920) {
+        sb.classList.remove('show');
+        if (ov) ov.classList.remove('show');
+      }
+    }
+
+    function resetPanels() {
+      [
+        'panelAdd',
+        'panelBulk',
+        'panelBooks',
+        'panelBorrowed',
+        'panelPayments',
+        'panelLibrarians',
+        'panelUsers'
+      ].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+    }
+
+    function openAddBook(btn) {
+      resetPanels();
+      const panel = document.getElementById('panelAdd');
+      if (panel) panel.style.display = 'block';
+      const at = document.getElementById('addTitle');
+      if (at) at.textContent = 'Add / Edit Book';
+      activateSidebar(btn);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showBulk(btn) {
+      resetPanels();
+      const panel = document.getElementById('panelBulk');
+      if (panel) panel.style.display = 'block';
+      activateSidebar(btn);
+    }
+
+    function showBooks(btn) {
+      resetPanels();
+      const panel = document.getElementById('panelBooks');
+      if (panel) panel.style.display = 'block';
+      activateSidebar(btn);
+      renderProgramTable();
+    }
+
+    function showBorrowedList(btn) {
+      resetPanels();
+      const panel = document.getElementById('panelBorrowed');
+      if (panel) panel.style.display = 'block';
+      activateSidebar(btn);
+      loadBorrowed();
+    }
+
+    function showPayments(btn) {
+      resetPanels();
+      const panel = document.getElementById('panelPayments');
+      if (panel) panel.style.display = 'block';
+      activateSidebar(btn);
+    }
+
+    function showLibrarians(btn) {
+      resetPanels();
+      const panel = document.getElementById('panelLibrarians');
+      if (panel) panel.style.display = 'block';
+      activateSidebar(btn);
+      loadLibrarians();
+    }
+
+    function showUsers(btn) {
+      resetPanels();
+      const panel = document.getElementById('panelUsers');
+      if (panel) panel.style.display = 'block';
+      activateSidebar(btn);
+      loadUsers();
+    }
+
+    /* ================== BOOKS CRUD ================== */
+    function programMatches(book, selectedProgram) {
+      if (!book) return false;
+      const want = (selectedProgram || '')
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .replace('.', '');
+      const cat = (book.category || book.program || '')
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .replace('.', '');
+      if (cat) {
+        if (cat === want) return true;
+        if (cat.includes(want)) return true;
+      }
+      return false;
+    }
+
+    async function loadAllBooks() {
+      try {
+        const res = await fetchWithAutoParse(`${API_BASE}/books/all`);
+        if (!res.ok) {
+          console.error('loadAllBooks failed', res.status, res.data);
+          throw new Error('Failed to fetch books');
+        }
+        allBooks = Array.isArray(res.data)
+          ? res.data
+          : res.data && res.data.books
+            ? res.data.books
+            : res.data || [];
+        if (!Array.isArray(allBooks)) allBooks = [];
+        renderProgramTable();
+      } catch (e) {
+        console.error(e);
+        toast('Error loading books');
+      }
+    }
+
+    function renderProgramTable() {
+      const selectedProgram = selectProgram.value || 'B.Tech';
+      if (currentProgram) currentProgram.textContent = selectedProgram;
+      const q = (searchBooks.value || '').trim().toLowerCase();
+
+      const filtered = (allBooks || []).filter((b) => {
+        if (!programMatches(b, selectedProgram)) return false;
+        if (!q) return true;
+        const title = (b.title || '').toLowerCase();
+        const author = (b.author || '').toLowerCase();
+        return title.includes(q) || author.includes(q);
+      });
+
+      const tbody = booksTbody;
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      if (!filtered.length) {
+        tbody.innerHTML =
+          '<tr><td colspan="8" class="center muted">No books found</td></tr>';
+        return;
+      }
+
+      filtered.forEach((b) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+        <td>${b.id ?? '-'}</td>
+        <td>${escapeHtml(b.title)}</td>
+        <td>${escapeHtml(b.author)}</td>
+        <td>${b.branch ?? '-'}</td>
+        <td>${b.year ?? '-'}</td>
+        <td>${b.available ?? 0}</td>
+        <td>${b.rack ?? '-'}</td>
+        <td class="actions">
+          <div class="action-group">
+            <button class="btn-small" onclick="viewPdf(${b.id})">View</button>
+            <button class="btn-small" onclick="editBook(${b.id})">Edit</button>
+            <button class="btn-small ghost" onclick="deleteBook(${b.id})">Delete</button>
+          </div>
+        </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function viewPdf(id) {
+      window.open(`${API_BASE}/books/pdf/${id}`, '_blank');
+    }
+
+    async function editBook(id) {
+      try {
+        const res = await fetchWithAutoParse(`${API_BASE}/books/${id}`);
+        if (!res.ok) throw new Error('book not found');
+        const b = res.data || {};
+        openAddBook();
+        const bookId = document.getElementById('bookId');
+        const bookTitle = document.getElementById('bookTitle');
+        const bookAuthor = document.getElementById('bookAuthor');
+        const bookCategory = document.getElementById('bookCategory');
+        const bookBranch = document.getElementById('bookBranch');
+        const bookYear = document.getElementById('bookYear');
+        const bookAvailable = document.getElementById('bookAvailable');
+        const bookRack = document.getElementById('bookRack');
+        const addTitle = document.getElementById('addTitle');
+        const editMode = document.getElementById('editMode');
+
+        if (bookId) bookId.value = b.id || '';
+        if (bookTitle) bookTitle.value = b.title || '';
+        if (bookAuthor) bookAuthor.value = b.author || '';
+        if (bookCategory) bookCategory.value = b.category || 'B.Tech';
+        if (bookBranch) bookBranch.value = b.branch || '';
+        if (bookYear) bookYear.value = b.year || '';
+        if (bookAvailable) bookAvailable.value = b.available || 0;
+        if (bookRack) bookRack.value = b.rack || '';
+        if (addTitle) addTitle.textContent = `Edit Book #${b.id || ''}`;
+        if (editMode) editMode.value = 'true';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (e) {
+        console.error(e);
+        toast('Cannot load book for edit');
+      }
+    }
+
+    async function deleteBook(id) {
+      if (!confirm('Delete this book?')) return;
+      try {
+        const res = await fetchWithAutoParse(`${API_BASE}/books/${id}`, {
+          method: 'DELETE'
+        });
+        if (!res.ok) throw new Error('Delete failed');
+        await loadAllBooks();
+      } catch (e) {
+        console.error(e);
+        toast('Delete failed');
+      }
+    }
+
+    const formBook = document.getElementById('formBook');
+    if (formBook) {
+      formBook.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        try {
+          const form = new FormData(ev.target);
+          const edit =
+            document.getElementById('editMode') &&
+            document.getElementById('editMode').value === 'true';
+          let url = `${API_BASE}/books/add`;
+          let method = 'POST';
+          if (edit && form.get('id')) {
+            url = `${API_BASE}/books/${form.get('id')}`;
+            method = 'PUT';
+          }
+          const res = await fetchWithAutoParse(url, { method, body: form });
+          if (!res.ok)
+            throw new Error(
+              (res.data && (res.data.message || JSON.stringify(res.data))) ||
+              'Save failed'
+            );
+          const txt =
+            typeof res.data === 'string'
+              ? res.data
+              : res.data && res.data.message
+                ? res.data.message
+                : 'Saved';
+          toast(txt);
+          resetAddForm();
+          await loadAllBooks();
+          showBooks();
+        } catch (e) {
+          console.error(e);
+          toast('Save failed: ' + (e.message || e));
+        }
+      });
+    }
+
+    function resetAddForm() {
+      const form = document.getElementById('formBook');
+      if (form) form.reset();
+      const editMode = document.getElementById('editMode');
+      if (editMode) editMode.value = 'false';
+      const addTitle = document.getElementById('addTitle');
+      if (addTitle) addTitle.textContent = 'Add / Edit Book';
+    }
+
+    /* ================== BULK UPLOAD ================== */
+    async function uploadBulk() {
+      try {
+        const bulkFile = document.getElementById('bulkFile');
+        const bulkResult = document.getElementById('bulkResult');
+        const bulkProgram = document.getElementById('bulkProgram');
+        const bulkErrorsContainer = document.getElementById('bulkErrors');
+
+        if (!bulkFile || !bulkFile.files || !bulkFile.files[0]) {
+          toast('Choose a CSV or XLSX file');
+          return;
+        }
+        const f = bulkFile.files[0];
+        const fd = new FormData();
+        fd.append('file', f);
+        const programVal = bulkProgram ? bulkProgram.value || 'AUTO' : 'AUTO';
+        if (programVal && programVal !== 'AUTO') fd.append('program', programVal);
+
+        if (bulkResult) bulkResult.textContent = 'Uploading...';
+        if (bulkErrorsContainer) bulkErrorsContainer.innerHTML = '';
+
+        const res = await fetchWithAutoParse(`${API_BASE}/books/bulk`, {
+          method: 'POST',
+          body: fd
+        });
+        console.log('Bulk upload response:', res);
+
+        if (!res.ok) {
+          console.error('Bulk upload failed', res.status, res.data);
+          const msg =
+            (res.data &&
+              (res.data.message || JSON.stringify(res.data))) ||
+            `Upload failed (HTTP ${res.status})`;
+          if (bulkResult) bulkResult.textContent = msg;
+          if (res.data && (res.data.failedRows || res.data.errors))
+            renderBulkErrors(res.data.failedRows || res.data.errors);
+          toast(msg);
+          return;
+        }
+
+        const j = res.data || {};
+        if (bulkResult)
+          bulkResult.textContent = `Inserted: ${j.inserted || 0}, Updated: ${j.updated || 0
+            }, Failed: ${j.failed || 0}`;
+        if (j.failed && (j.failedRows || j.errors))
+          renderBulkErrors(j.failedRows || j.errors);
+        else if (j.failed && !j.failedRows)
+          toast(
+            `Upload finished: ${j.inserted || 0} inserted, ${j.failed || 0
+            } failed. Check server logs for details.`
+          );
+        await loadAllBooks();
+      } catch (e) {
+        console.error('uploadBulk error', e);
+        toast('Upload failed: ' + (e.message || e));
+      }
+    }
+
+    function renderBulkErrors(list) {
+      let container = document.getElementById('bulkErrors');
+      if (!container) {
+        const panel = document.getElementById('panelBulk') || document.body;
+        container = document.createElement('div');
+        container.id = 'bulkErrors';
+        container.style.marginTop = '12px';
+        panel.appendChild(container);
+      }
+      container.innerHTML =
+        '<h4 style="margin-bottom:6px">Failed rows / errors</h4>';
+      if (!Array.isArray(list)) {
+        container.innerHTML += `<pre>${escapeHtml(
+          JSON.stringify(list, null, 2)
+        )}</pre>`;
+        return;
+      }
+      const table = document.createElement('table');
+      table.style.width = '100%';
+      table.style.borderCollapse = 'collapse';
+      table.innerHTML =
+        '<thead><tr><th style="border:1px solid #ddd;padding:6px">Row</th><th style="border:1px solid #ddd;padding:6px">Reason / Error</th></tr></thead>';
+      const tbody = document.createElement('tbody');
+      list.forEach((item) => {
+        const tr = document.createElement('tr');
+        const row = item.row ?? item.index ?? '';
+        const reason = item.error || item.reason || JSON.stringify(item);
+        tr.innerHTML = `<td style="border:1px solid #ddd;padding:6px">${escapeHtml(
+          String(row)
+        )}</td><td style="border:1px solid #ddd;padding:6px">${escapeHtml(
+          String(reason)
+        )}</td>`;
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      container.appendChild(table);
+    }
+
+    (function wireBulkPreviewAndBtn() {
+      const bulkFile = document.getElementById('bulkFile');
+      const filenameEl = document.getElementById('bulkFilename');
+      if (bulkFile)
+        bulkFile.addEventListener('change', () => {
+          if (filenameEl)
+            filenameEl.textContent = bulkFile.files[0]
+              ? bulkFile.files[0].name
+              : 'No file chosen';
+        });
+      const uploadBtn = document.getElementById('uploadBtn');
+      if (uploadBtn)
+        uploadBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          uploadBulk();
+        });
+    })();
+
+    // Download template files (you must have these endpoints in backend)
+    function downloadTemplate(type) {
+      const ext = type === 'xlsx' ? 'xlsx' : 'csv';
+      window.open(`${API_BASE}/books/template.${ext}`, '_blank');
+    }
+
+    /* ================== BORROWED LIST / FINES ================== */
+    function parseYMD(d) {
+      if (!d) return null;
+      const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
+      const dt = new Date(d);
+      return isNaN(dt)
+        ? null
+        : new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+    }
+
+    function daysBetween(a, b) {
+      const A = new Date(a.getFullYear(), a.getMonth(), a.getDate());
+      const B = new Date(b.getFullYear(), b.getMonth(), b.getDate());
+      return Math.floor((B - A) / 86400000);
+    }
+
+    // fine = ₹1 per late day (you can change here)
+    function computeFineLive(row) {
+      if (row.returned) return row.fineAmount || 0;
+      const due = parseYMD(row.expectedReturnDate);
+      if (!due) return row.fineAmount || 0;
+      const late = daysBetween(due, new Date());
+      return Math.max(0, late);
+    }
+
+    function normalizeProgramParam(p) {
+      if (!p) return '';
+      const v = String(p).toUpperCase();
+      if (v.includes('BTECH')) return 'BTECH';
+      if (v.includes('MTECH')) return 'MTECH';
+      if (v.includes('MBA')) return 'MBA';
+      return '';
+    }
+
+    async function loadBorrowed() {
+      try {
+        const filterEmail =
+          document.getElementById('filterEmail') || { value: '' };
+        const borrowProgram =
+          document.getElementById('borrowProgram') || { value: '' };
+        const emailQ = (filterEmail.value || '').trim();
+        const progQ = normalizeProgramParam(borrowProgram.value || '');
+
+        const url = new URL(
+          `${API_BASE}/admin/borrowed-list`,
+          window.location.origin
+        );
+        if (emailQ) url.searchParams.set('email', emailQ);
+        if (progQ) url.searchParams.set('program', progQ);
+
+        const res = await fetchWithAutoParse(url.toString());
+        if (!res.ok) {
+          console.error('loadBorrowed failed', res.status, res.data);
+          throw new Error('Failed to load borrowed records');
+        }
+        borrowedList = Array.isArray(res.data)
+          ? res.data
+          : res.data && res.data.records
+            ? res.data.records
+            : res.data || [];
+        if (!Array.isArray(borrowedList)) borrowedList = [];
+        borrowedList.sort((a, b) => (b.id || 0) - (a.id || 0));
+        renderBorrowed();
+      } catch (e) {
+        console.error(e);
+        toast('Failed to load borrowed records');
+      }
+    }
+
+    function resetBorrowedFilters() {
+      const f = document.getElementById('filterEmail');
+      if (f) f.value = '';
+      const p = document.getElementById('borrowProgram');
+      if (p) p.value = '';
+      loadBorrowed();
+    }
+
+    function renderBorrowed() {
+      const borrowedTbody =
+        document.getElementById('borrowedTbody') || {
+          innerHTML: '',
+          appendChild: () => { }
+        };
+      const tbody = borrowedTbody;
+      tbody.innerHTML = '';
+
+      if (!borrowedList || !borrowedList.length) {
+        tbody.innerHTML =
+          '<tr><td colspan="10" class="center muted">No borrowed records</td></tr>';
+        return;
+      }
+
+      borrowedList.forEach((b) => {
+        const returned = b.returned ? 'Yes' : 'No';
+        const fineLive = computeFineLive(b);
+        const finePaidFlag = (b.finePaid ?? 0) != 0;
+
+        // Due amount still not paid
+        const due = finePaidFlag ? 0 : fineLive;
+
+        let actionHTML = '-';
+        if (b.status === 'REQUESTED' || b.status === 'PENDING')
+          actionHTML = `<button class="btn-small" onclick="openApproveModal(${b.id})">Approve</button>`;
+        else if (
+          !b.returned &&
+          (b.status === 'RETURN_REQUESTED' || b.status === 'PENDING_RETURN')
+        )
+          actionHTML = `<button class="btn-small" onclick="openReturnModal(${b.id})">Approve Return</button>`;
+
+        const badges = [];
+        if (due > 0) badges.push(`<span class="pill">Fine Due ₹${due}</span>`);
+        if (finePaidFlag && fineLive > 0)
+          badges.push('<span class="pill">Fine Paid</span>');
+        if (b.status === 'RETURN_REQUESTED' || b.status === 'PENDING_RETURN')
+          badges.push('<span class="pill">Return Requested</span>');
+        if (b.status === 'LOST') badges.push('<span class="pill">Lost</span>');
+        if (b.status === 'LOST_SETTLED')
+          badges.push('<span class="pill">Lost Settled</span>');
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+        <td>${b.id}</td>
+        <td>${escapeHtml(b.userEmail || '-')}</td>
+        <td>${escapeHtml(b.bookTitle || '-')}</td>
+        <td>${escapeHtml(b.bookCode || '-')}</td>
+        <td>${b.borrowDate || '-'}</td>
+        <td>${b.expectedReturnDate || '-'}</td>
+        <td>${b.status || '-'} ${badges.length ? '<br/>' + badges.join(' ') : ''
+          }</td>
+        <td>${returned}</td>
+        <td>₹${fineLive}</td>
+        <td class="actions">${actionHTML}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* ================== APPROVE / RETURN ================== */
+    function openApproveModal(borrowId) {
+      approvingBorrowId = borrowId;
+      const approveBookCode = document.getElementById('approveBookCode');
+      if (approveBookCode) approveBookCode.value = '';
+      const modalApprove = document.getElementById('modalApprove');
+      if (modalApprove) modalApprove.style.display = 'flex';
+      if (approveBookCode) approveBookCode.focus();
+    }
+
+    function closeApproveModal() {
+      approvingBorrowId = null;
+      const modalApprove = document.getElementById('modalApprove');
+      if (modalApprove) modalApprove.style.display = 'none';
+    }
+
+    const btnApproveConfirm = document.getElementById('btnApproveConfirm');
+    if (btnApproveConfirm)
+      btnApproveConfirm.addEventListener('click', async () => {
+        const approveBookCode = document.getElementById('approveBookCode');
+        const code = approveBookCode ? approveBookCode.value.trim() : '';
+        if (!code) return toast('Book code required');
+        try {
+          const res = await fetchWithAutoParse(
+            `${API_BASE}/admin/approve/${approvingBorrowId}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ bookCode: code })
+            }
+          );
+          if (!res.ok)
+            throw new Error(
+              (res.data && (res.data.message || JSON.stringify(res.data))) ||
+              'Approve failed'
+            );
+          toast(
+            (res.data && (res.data.message || 'Approved')) || 'Approved'
+          );
+          closeApproveModal();
+          await loadAllBooks();
+          await loadBorrowed();
+        } catch (e) {
+          console.error(e);
+          toast('Approve failed: ' + (e.message || e));
+        }
+      });
+
+    function openReturnModal(borrowId) {
+      approvingReturnId = borrowId;
+      const modalReturn = document.getElementById('modalReturn');
+      if (modalReturn) modalReturn.style.display = 'flex';
+    }
+
+    function closeReturnModal() {
+      approvingReturnId = null;
+      const modalReturn = document.getElementById('modalReturn');
+      if (modalReturn) modalReturn.style.display = 'none';
+    }
+
+    const btnReturnConfirm = document.getElementById('btnReturnConfirm');
+    if (btnReturnConfirm)
+      btnReturnConfirm.addEventListener('click', async () => {
+        try {
+          const res = await fetchWithAutoParse(
+            `${API_BASE}/admin/approve-return/${approvingReturnId}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' }
+            }
+          );
+          if (!res.ok)
+            throw new Error(
+              (res.data &&
+                (res.data.message || JSON.stringify(res.data))) ||
+              'Approve return failed'
+            );
+
+          // Best-effort email, ignore errors
+          try {
+            await fetchWithAutoParse(
+              `${API_BASE}/admin/send-no-due/${approvingReturnId}`,
+              { method: 'POST' }
+            );
+          } catch (_) { }
+
+          toast(
+            (res.data && (res.data.message || 'Return approved')) ||
+            'Return approved'
+          );
+          closeReturnModal();
+          await loadBorrowed();
+          await loadAllBooks();
+        } catch (e) {
+          console.error(e);
+          toast(e.message || 'Approve return failed');
+        }
+      });
+    /* ================== PAYMENTS & LOST (ADMIN SIDE) ================== */
+
+    /* ---------- LOOKUP PAYMENT ---------- */
+
+    async function lookupPayment() {
+      const idInput = document.getElementById('payBorrowId');
+      const payCard = document.getElementById('payCard');
+      const payInfo = document.getElementById('payInfo');
+
+      if (!idInput || !idInput.value) {
+        toast('Enter a Borrow ID');
+        return;
+      }
+      const borrowId = Number(idInput.value);
+
+      try {
+        // Uses AdminPaymentController#getPayment
+        const res = await fetchWithAutoParse(`${API_BASE}/admin/payments/${borrowId}`);
+        if (!res.ok) {
+          console.error('lookupPayment failed', res.status, res.data);
+          toast(
+            (res.data && (res.data.message || JSON.stringify(res.data))) ||
+            'Borrow not found'
+          );
+          if (payCard) payCard.style.display = 'none';
+          return;
+        }
+
+        paymentBorrow = res.data || {};
+        const due =
+          paymentBorrow.due ??
+          paymentBorrow.fineDue ??
+          paymentBorrow.fine ??
+          paymentBorrow.fineAmount ??
+          0;
+
+        const email = paymentBorrow.userEmail || paymentBorrow.email || '-';
+        const title = paymentBorrow.bookTitle || '-';
+
+        if (payInfo) {
+          payInfo.innerHTML = `
+        <div><b>Borrow ID:</b> ${borrowId}</div>
+        <div><b>User:</b> ${escapeHtml(email)}</div>
+        <div><b>Book:</b> ${escapeHtml(title)}</div>
+        <div><b>Fine Due:</b> ₹${due}</div>
+      `;
+        }
+        if (payCard) payCard.style.display = 'block';
+      } catch (e) {
+        console.error(e);
+        toast('Error while looking up payment');
+      }
+    }
+
+    /* ---------- CREATE RAZORPAY ORDER (ADMIN) ---------- */
+    /**
+     * We send RUPEES to backend as "amountRupees".
+     * RazorpayService will convert to paise internally,
+     * same as the student flow.
+     */
+    async function createAdminRzpOrder(borrowId, fineRupees) {
+      const cleanRupees = Math.max(1, Math.round(Number(fineRupees) || 0));
+
+      const payload = {
+        amountRupees: fineRupees,
+        borrowId: borrowId,
+        notes: {
+          description: `Admin payment for borrow ${borrowId}`
+        }
+      };
+
+      const res = await fetchWithAutoParse(`${API_BASE}/payments/admin/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        console.error('createAdminRzpOrder failed', res.status, res.data);
+        throw new Error(
+          (res.data && (res.data.message || JSON.stringify(res.data))) ||
+          'Failed to create Razorpay order'
+        );
+      }
+      return res.data;
+    }
+
+    const btnRzpPay = document.getElementById('btnRzpPay');
+    if (btnRzpPay) {
+      btnRzpPay.addEventListener('click', async () => {
+        if (!paymentBorrow) {
+          toast('Lookup a borrow first');
+          return;
+        }
+
+        const borrowId = paymentBorrow.borrowId || paymentBorrow.id;
+        let fineRupees =
+          paymentBorrow.due ??
+          paymentBorrow.fineDue ??
+          paymentBorrow.fine ??
+          paymentBorrow.fineAmount ??
+          0;
+
+        fineRupees = Math.max(1, Number(fineRupees) || 0);
+        if (!fineRupees || fineRupees <= 0) {
+          toast('No fine due');
+          return;
+        }
+
+        try {
+          const order = await createAdminRzpOrder(borrowId, fineRupees);
+
+          // amount FROM backend is already in paise for Razorpay widget
+          const options = {
+            key: order.key || order.keyId,
+            amount: order.amount,         // paise
+            currency: order.currency || 'INR',
+            name: order.name || 'Library Fine',
+            description: order.description || `Fine for borrow #${borrowId}`,
+            order_id: order.orderId || order.id,
+            handler: async function (response) {
+              const payload = {
+                borrowId,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpaySignature: response.razorpay_signature
+              };
+
+              const res = await fetchWithAutoParse(`${API_BASE}/payments/verify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+
+              if (!res.ok) {
+                console.error('Razorpay verify failed (admin)', res.status, res.data);
+                toast(
+                  (res.data &&
+                    (res.data.message || JSON.stringify(res.data))) ||
+                  'Payment captured, but server failed to verify. Check logs.'
+                );
+              } else {
+                toast('Payment successful');
+                const payCard = document.getElementById('payCard');
+                if (payCard) payCard.style.display = 'none';
+                await loadBorrowed();
+              }
+            },
+            prefill: {
+              email: paymentBorrow.userEmail || '',
+              name: paymentBorrow.userName || ''
+            },
+            theme: { color: '#5b21b6' }
+          };
+
+          const rzp = new Razorpay(options);
+          rzp.open();
+        } catch (e) {
+          console.error(e);
+          toast(e.message || 'Failed to start Razorpay payment');
+        }
+      });
+    }
+
+    /* ---------- CASH PAYMENT (ADMIN) ---------- */
+
+    const btnCashPay = document.getElementById('btnCashPay');
+    if (btnCashPay) {
+      btnCashPay.addEventListener('click', async () => {
+        if (!paymentBorrow) {
+          toast('Lookup a borrow first');
+          return;
+        }
+        const borrowId = paymentBorrow.borrowId || paymentBorrow.id;
+        const amount =
+          paymentBorrow.due ??
+          paymentBorrow.fineDue ??
+          paymentBorrow.fine ??
+          paymentBorrow.fineAmount ??
+          0;
+
+        try {
+          const res = await fetchWithAutoParse(
+            `${API_BASE}/admin/payments/${borrowId}/cash`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ amount })
+            }
+          );
+
+          if (!res.ok) {
+            console.error('cash pay failed', res.status, res.data);
+            toast(
+              (res.data &&
+                (res.data.message || JSON.stringify(res.data))) ||
+              'Failed to mark cash payment'
+            );
+            return;
+          }
+          toast('Cash payment recorded');
+          const payCard = document.getElementById('payCard');
+          if (payCard) payCard.style.display = 'none';
+          await loadBorrowed();
+        } catch (e) {
+          console.error(e);
+          toast('Failed to mark cash payment');
+        }
+      });
+    }
+
+    /* ---------- LOST MODAL ---------- */
+
+    function openLostModal() {
+      if (!paymentBorrow) {
+        toast('Lookup a borrow first');
+        return;
+      }
+      const modal = document.getElementById('modalLost');
+      const input = document.getElementById('lostAmount');
+      if (modal) modal.style.display = 'flex';
+      if (input) input.value = '';
+    }
+
+    function closeLostModal() {
+      const modal = document.getElementById('modalLost');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function sendLostUpdate(mode) {
+      if (!paymentBorrow) {
+        toast('Lookup a borrow first');
+        return;
+      }
+      const amountEl = document.getElementById('lostAmount');
+      const amount = amountEl && amountEl.value ? Number(amountEl.value) : 0;
+      if (!amount || amount <= 0) {
+        toast('Enter a valid amount');
+        return;
+      }
+
+      const borrowId = paymentBorrow.borrowId || paymentBorrow.id;
+
+      let backendMode = 'NONE';
+      if (mode === 'ADD_CASH') backendMode = 'CASH';
+      if (mode === 'ADD_RAZORPAY') backendMode = 'RZP';
+
+      try {
+        const res = await fetchWithAutoParse(
+          `${API_BASE}/admin/payments/${borrowId}/lost`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ extra: amount, mode: backendMode })
+          }
+        );
+
+        if (!res.ok) {
+          console.error('lost update failed', res.status, res.data);
+          toast(
+            (res.data &&
+              (res.data.message || JSON.stringify(res.data))) ||
+            'Failed to mark lost'
+          );
+          return;
+        }
+
+        toast('Lost status updated');
+        closeLostModal();
+        await loadBorrowed();
+      } catch (e) {
+        console.error(e);
+        toast('Failed to update lost status');
+      }
+    }
+
+    function lostAddOnly() {
+      sendLostUpdate('ADD_ONLY');
+    }
+    function lostAddCash() {
+      sendLostUpdate('ADD_CASH');
+    }
+    function lostAddRzp() {
+      sendLostUpdate('ADD_RAZORPAY');
+    }
+    /* ---------- LIBRARIANS (SUPERADMIN ONLY PANEL) ---------- */
+
+    async function loadLibrarians() {
+      const libsTbody = document.getElementById('libsTbody') || {
+        innerHTML: '',
+        appendChild: () => { }
+      };
+
+      try {
+        const res = await fetchWithAutoParse(`${API_BASE}/admin/librarians`);
+
+        if (!res.ok) {
+          console.error('loadLibrarians failed', res.status, res.data);
+          libsTbody.innerHTML =
+            `<tr><td colspan="4">Failed to load librarians (HTTP ${res.status}). See console.</td></tr>`;
+          return;
+        }
+
+        const arr = Array.isArray(res.data)
+          ? res.data
+          : (res.data && res.data.librarians)
+            ? res.data.librarians
+            : (res.data || []);
+
+        libsTbody.innerHTML = '';
+
+        if (!arr.length) {
+          libsTbody.innerHTML = `<tr><td colspan="4">No librarians found</td></tr>`;
+          return;
+        }
+
+        arr.forEach(l => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+        <td>${l.id ?? '-'}</td>
+        <td>${escapeHtml(l.username || '-')}</td>
+        <td>${l.active ? 'Yes' : 'No'}</td>
+        <td class="actions">
+          <div class="action-group">
+            <button class="btn-small"
+                    onclick="toggleLib(${l.id}, ${l.active ? false : true})">
+              ${l.active ? 'Deactivate' : 'Activate'}
+            </button>
+            <button class="btn-small warn"
+                    onclick="deleteLibrarian(${l.id})">
+              Delete
+            </button>
+          </div>
+        </td>`;
+          libsTbody.appendChild(tr);
+        });
+      } catch (e) {
+        console.error(e);
+        libsTbody.innerHTML = `<tr><td colspan="4">Error loading librarians</td></tr>`;
+      }
+    }
+
+    async function addLibrarian() {
+      try {
+        const uEl = document.getElementById('libUsername') || { value: '' };
+        const pEl = document.getElementById('libPassword') || { value: '' };
+
+        const username = (uEl.value || '').trim();
+        const password = (pEl.value || '').trim();
+
+        if (!username || !password) {
+          toast('Enter both username and password');
+          return;
+        }
+
+        const res = await fetchWithAutoParse(`${API_BASE}/admin/librarians`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        if (!res.ok) {
+          console.error('addLibrarian failed', res.status, res.data);
+          toast(
+            (res.data && (res.data.message || JSON.stringify(res.data))) ||
+            'Add failed'
+          );
+          return;
+        }
+
+        uEl.value = '';
+        pEl.value = '';
+        toast('Librarian created successfully');
+        await loadLibrarians();
+      } catch (e) {
+        console.error(e);
+        toast('Add failed');
+      }
+    }
+
+    async function toggleLib(id, activeVal) {
+      try {
+        const res = await fetchWithAutoParse(
+          `${API_BASE}/admin/librarians/${id}/active`,
+          {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ active: !!activeVal })
+          }
+        );
+
+        if (!res.ok) {
+          console.error('toggleLib failed', res.status, res.data);
+          toast('Toggle failed');
+          return;
+        }
+
+        await loadLibrarians();
+      } catch (e) {
+        console.error(e);
+        toast('Toggle failed');
+      }
+    }
+
+    async function deleteLibrarian(id) {
+      if (!confirm('Delete this librarian?')) return;
+
+      try {
+        const res = await fetchWithAutoParse(
+          `${API_BASE}/admin/librarians/${id}`,
+          { method: 'DELETE' }
+        );
+
+        if (!res.ok) {
+          console.error('deleteLibrarian failed', res.status, res.data);
+          toast('Delete failed');
+          return;
+        }
+
+        toast('Librarian deleted');
+        await loadLibrarians();
+      } catch (e) {
+        console.error(e);
+        toast('Delete failed');
+      }
+    }
+    /* ================== USERS SUMMARY ================== */
+    async function loadUsers() {
+      try {
+        const res = await fetchWithAutoParse(
+          `${API_BASE}/borrow/all-borrowed`
+        );
+        if (!res.ok) throw new Error('Failed');
+        const arr = Array.isArray(res.data)
+          ? res.data
+          : res.data && res.data.records
+            ? res.data.records
+            : res.data || [];
+        const map = {};
+        (arr || []).forEach((b) => {
+          const u = b.userEmail || 'unknown';
+          map[u] = (map[u] || 0) + 1;
+        });
+        const usersTbody =
+          document.getElementById('usersTbody') || {
+            innerHTML: '',
+            appendChild: () => { }
+          };
+        usersTbody.innerHTML = '';
+        if (!Object.keys(map).length) {
+          usersTbody.innerHTML =
+            '<tr><td colspan="2">No users</td></tr>';
+          return;
+        }
+        Object.entries(map).forEach(([u, c]) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${escapeHtml(u)}</td><td>${c}</td>`;
+          usersTbody.appendChild(tr);
+        });
+      } catch (e) {
+        console.error(e);
+        toast('Failed to load users');
+      }
+    }
+
+    /* ================== INIT & LOGOUT ================== */
+    function logout() {
+      localStorage.clear();
+      window.location.href = '/';
+    }
+
+    window.onload = function () {
+      try { selectProgram.value = 'B.Tech'; } catch (e) { }
+
+      // apply role-based visibility (SUPER_ADMIN vs others)
+      applyRoleVisibility();
+
+      // make first sidebar button active
+      const firstBtn = document.querySelector('.sidebar .btn');
+      if (firstBtn) activateSidebar(firstBtn);
+      loadAllBooks();
+      showBooks(firstBtn);
+
+      // wire click-to-open for small screens hamburger
+      const ham = document.querySelector('.hamburger');
+      if (ham) ham.addEventListener('click', () => toggleSidebar(true));
+    };
+  </script>
+</body>
+
+</html>

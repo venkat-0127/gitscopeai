@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Digital Resources</title>
+  <style>
+    :root {
+      --bg: #f5f7f9;
+      --ink: #0f172a;
+      --panel: #ffffff;
+      --line: #e5e7eb;
+      --muted: #667085;
+      --brand: #0891b2;
+      --brand-2: #0ea5a5;
+      --side: #0b1220;
+      --side-accent: #12203a;
+      --chip: #eef4f7;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, Segoe UI, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink)
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--side);
+      color: #fff;
+      padding: 20px;
+      position: fixed;
+      inset: 0 auto 0 0;
+      overflow: auto
+    }
+
+    .content {
+      margin-left: 280px;
+      padding: 24px
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px
+    }
+
+    .logo-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2))
+    }
+
+    .brand h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700
+    }
+
+    .side-title {
+      margin: 12px 0 8px;
+      font-size: 12px;
+      letter-spacing: .55px;
+      text-transform: uppercase;
+      opacity: .9
+    }
+
+    .sep {
+      height: 1px;
+      background: rgba(255, 255, 255, .12);
+      margin: 14px 0
+    }
+
+    .nav {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .nav a {
+      display: block;
+      color: #e6f6f8;
+      text-decoration: none;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, .12)
+    }
+
+    .nav a:hover {
+      background: rgba(255, 255, 255, .06);
+      border-color: rgba(255, 255, 255, .2)
+    }
+
+    .cat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .cat-btn {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: transparent;
+      color: #e6f6f8;
+      text-align: left;
+      cursor: pointer
+    }
+
+    .cat-btn:hover {
+      background: rgba(255, 255, 255, .06)
+    }
+
+    .cat-btn.active {
+      background: var(--side-accent);
+      border-color: transparent
+    }
+
+    .btn.side {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, .2);
+      background: transparent;
+      color: #e6f6f8;
+      cursor: pointer
+    }
+
+    .btn.side:hover {
+      background: rgba(255, 255, 255, .06)
+    }
+
+    /* Content */
+    .page-head {
+      background: linear-gradient(135deg, rgba(8, 145, 178, .12), rgba(14, 165, 165, .10));
+      border: 1px solid var(--line);
+      padding: 14px 16px;
+      border-radius: 14px;
+      margin-bottom: 12px
+    }
+
+    .page-head h1 {
+      margin: 0 0 2px;
+      font-size: 28px
+    }
+
+    .page-head .sub {
+      color: var(--muted);
+      font-size: 13.5px
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px
+    }
+
+    .panel-body {
+      padding: 14px
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 4px 0 12px
+    }
+
+    .toolbar input,
+    .toolbar select {
+      flex: 1;
+      min-width: 220px;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      background: #fff
+    }
+
+    .btn {
+      padding: 10px 12px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer
+    }
+
+    .btn.primary {
+      background: var(--brand);
+      color: #fff
+    }
+
+    .btn.primary:hover {
+      background: var(--brand-2)
+    }
+
+    .btn.secondary {
+      background: #eef2f5
+    }
+
+    .btn.small {
+      padding: 6px 8px;
+      font-size: .92rem
+    }
+
+    /* Tiles */
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 8px
+    }
+
+    .tile {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 14px
+    }
+
+    .tile h4 {
+      margin: 0 0 6px
+    }
+
+    .tile p {
+      margin: 0 0 10px;
+      color: #6b7280;
+      font-size: .92rem
+    }
+
+    .tile .open {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    /* Table */
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+      background: #fff
+    }
+
+    th,
+    td {
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top
+    }
+
+    th {
+      background: #f8fafc;
+      position: sticky;
+      top: 0
+    }
+
+    tr:hover {
+      background: #fafafa
+    }
+
+    .muted {
+      color: #6b7280
+    }
+
+    .empty {
+      text-align: center;
+      color: #6b7280;
+      padding: 18px
+    }
+
+    /* YouTube */
+    .video-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 12px;
+      align-items: start
+    }
+
+    .v-item {
+      display: flex;
+      gap: 8px;
+      cursor: pointer;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 8px;
+      background: #fff
+    }
+
+    .v-item img {
+      width: 120px;
+      height: 68px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--line)
+    }
+
+    .v-title {
+      font-weight: 600
+    }
+
+    .yt-wrap {
+      position: relative;
+      padding-top: 56.25%;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #000
+    }
+
+    .yt-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .42);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999
+    }
+
+    .modal {
+      background: #fff;
+      padding: 18px;
+      border-radius: 12px;
+      min-width: 380px;
+      max-width: 92vw;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, .25)
+    }
+
+    .modal h3 {
+      margin: 0 0 8px
+    }
+
+    .modal input,
+    .modal textarea,
+    .modal select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      margin-bottom: 8px
+    }
+
+    @media (max-width:960px) {
+      .sidebar {
+        position: static;
+        width: 100%;
+        height: auto
+      }
+
+      .content {
+        margin-left: 0;
+        padding: 16px
+      }
+
+      .video-grid {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand"><span class="logo-dot"></span>
+      <h2>Digital Hub</h2>
+    </div>
+
+    <div class="side-title">Actions</div>
+    <ul class="nav">
+      <li><a href="#" id="navUpload">Add Resource</a></li>
+    </ul>
+
+    <div class="side-title">Explore</div>
+    <div class="cat-list" id="catList">
+      <button class="cat-btn active" data-mode="VIDEOS">Video Lectures</button>
+      <button class="cat-btn" data-mode="EBOOKS">E-Books</button>
+      <button class="cat-btn" data-mode="COURSES">Courses</button>
+      <button class="cat-btn" data-mode="DATASETS">Datasets</button>
+      <button class="cat-btn" data-mode="TOOLS">Tools</button>
+      <button class="cat-btn" data-mode="WEBSITES">Websites</button>
+      <button class="cat-btn" data-mode="LECTURE_NOTES">Lecture Notes</button>
+      <button class="cat-btn" data-mode="QUESTION_PAPER">Question Papers</button>
+    </div>
+
+    <div class="sep"></div>
+    <button class="btn side" onclick="window.location.href='/tiles'">← Back</button>
+  </aside>
+
+  <!-- Content -->
+  <main class="content">
+    <div class="page-head">
+      <h1>Digital Resources</h1>
+      <div class="sub">Search and launch videos, e-books, courses, datasets, tools, and more — all in one place.</div>
+    </div>
+
+    <div id="panel" class="panel">
+      <div class="panel-body"></div>
+    </div>
+  </main>
+
+  <!-- Add Resource Modal -->
+  <div class="modal-backdrop" id="addModal">
+    <div class="modal">
+      <h3>Add Resource</h3>
+      <input id="a_title" placeholder="Title" />
+      <textarea id="a_desc" placeholder="Description"></textarea>
+      <select id="a_cat">
+        <option value="EBOOK">E-Book</option>
+        <option value="LECTURE_NOTES">Lecture Notes</option>
+        <option value="VIDEO">Video</option>
+        <option value="QUESTION_PAPER">Question Paper</option>
+      </select>
+      <input id="a_tags" placeholder="Tags (comma separated)" />
+      <input id="a_authors" placeholder="Authors / Instructors" />
+      <input id="a_year" placeholder="Year" />
+      <input id="a_provider" placeholder="Provider (NPTEL, Coursera…)" />
+      <input id="a_source" placeholder="Source URL" />
+      <input id="a_download" placeholder="Download URL (optional)" />
+      <input id="a_thumb" placeholder="Thumbnail URL (optional)" />
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+        <button class="btn primary" id="saveAdd">Save</button>
+        <button class="btn secondary" onclick="closeModal('addModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ---- Endpoints ---- */
+    const API_AGG = "http://localhost:8083/api/resources/aggregate-search";
+    const API_BASE = "http://localhost:8083/api/resources";
+
+    /* ---- State ---- */
+    let mode = "VIDEOS";
+    const panelBody = document.querySelector('#panel .panel-body');
+
+    /* ---- Sidebar wiring ---- */
+    document.getElementById('navUpload').onclick = () => openModal('addModal');
+    document.querySelectorAll('#catList .cat-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#catList .cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        mode = btn.getAttribute('data-mode');
+        renderPanel();
+      };
+    });
+
+    /* ------------ Helpers ------------ */
+    async function aggSearch(q, limit = 12) {
+      const r = await fetch(`${API_AGG}?q=${encodeURIComponent(q)}&limit=${limit}`);
+      if (!r.ok) throw new Error(r.status);
+      const data = await r.json().catch(() => ({ content: [] }));
+      return data.content || [];
+    }
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function esc(s) { return (s || "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[m])); }
+    function openNew(u) { if (u) window.open(u, '_blank', 'noopener'); }
+    function v(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+    function toInt(s) { const n = parseInt(s, 10); return Number.isFinite(n) ? n : null; }
+    async function fetchJSON(url, opts) {
+      const r = await fetch(url, Object.assign({ headers: { 'Content-Type': 'application/json' } }, opts || {}));
+      if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json().catch(() => ({}));
+    }
+
+    /* ------------ Renderers ------------ */
+    function renderPanel() {
+      switch (mode) {
+        case 'VIDEOS': return renderVideosPanel();
+        case 'EBOOKS': return renderBooksPanel();
+        case 'COURSES': return renderCoursesPanel();     // updated
+        case 'DATASETS': return renderDatasetsPanel();    // same as before
+        case 'TOOLS': return renderToolsPanel();       // tiles only
+        case 'WEBSITES': return renderWebsitesPanel();    // tiles only
+        case 'LECTURE_NOTES': return renderInternalList('LECTURE_NOTES');
+        case 'QUESTION_PAPER': return renderInternalList('QUESTION_PAPER');
+        default: return renderVideosPanel();
+      }
+    }
+
+    /* 1) Video Lectures */
+    function renderVideosPanel() {
+      panelBody.innerHTML = `
+        <div class="toolbar">
+          <input id="ytq" placeholder="Search YouTube lectures (e.g., DBMS NPTEL, Data Structures)"/>
+          <button class="btn primary" id="ytSearch">Search</button>
+        </div>
+        <div class="video-grid">
+          <div><div id="ytList"></div></div>
+          <div>
+            <div class="yt-wrap"><iframe id="ytPlayer" allowfullscreen></iframe></div>
+            <p class="muted" id="ytHint" style="margin-top:8px"></p>
+          </div>
+        </div>
+      `;
+      const listEl = document.getElementById('ytList');
+      const player = document.getElementById('ytPlayer');
+      const hint = document.getElementById('ytHint');
+
+      window.playVideo = (id) => { player.src = `https://www.youtube.com/embed/${id}`; };
+
+      async function search(q) {
+        listEl.innerHTML = `<div class="empty" style="border:1px solid var(--line);border-radius:12px;padding:12px">Searching…</div>`;
+        hint.textContent = '';
+        try {
+          const items = (await aggSearch(q, 15)).filter(x => (x.type || '').toUpperCase() === 'VIDEO' && x.extra);
+          if (!items.length) {
+            listEl.innerHTML = `<div class="empty" style="border:1px solid var(--line);border-radius:12px;padding:12px">
+              No YouTube results.<br/><a href="https://www.youtube.com/results?search_query=${encodeURIComponent(q)}" target="_blank">Open on YouTube</a>
+            </div>`;
+            player.src = '';
+            return;
+          }
+          listEl.innerHTML = items.map(v => `
+            <div class="v-item" onclick="playVideo('${v.extra}')">
+              <img src="${esc(v.thumbnail || '')}" alt="">
+              <div>
+                <div class="v-title">${esc(v.title || 'Untitled')}</div>
+                <div class="muted">${esc(v.author || '')}</div>
+              </div>
+            </div>`).join('');
+          playVideo(items[0].extra);
+          hint.textContent = 'Playing inline. Click a video from the list to switch.';
+        } catch (e) {
+          console.error(e);
+          listEl.innerHTML = `<div class="empty">Error fetching videos</div>`;
+          player.src = '';
+        }
+      }
+      document.getElementById('ytSearch').onclick = () => {
+        const q = document.getElementById('ytq').value.trim();
+        if (!q) return alert('Enter a query');
+        search(q);
+      };
+      document.getElementById('ytq').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('ytSearch').click(); });
+      search('computer science lectures');
+    }
+
+    /* 2) E-Books */
+    function renderBooksPanel() {
+      panelBody.innerHTML = `
+        <div class="toolbar">
+          <input id="bq" placeholder="Search e-books (e.g., Operating Systems, Algorithms)"/>
+          <button class="btn primary" id="bSearch">Search</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th style="width:38%">Title</th><th>Provider</th><th>Author</th><th>Year</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="booksBody">
+              <tr><td colspan="5" class="empty">Type a query and press Search</td></tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+      const body = document.getElementById('booksBody');
+      async function searchBooks(q) {
+        body.innerHTML = `<tr><td colspan="5" class="empty">Searching…</td></tr>`;
+        try {
+          const items = (await aggSearch(q, 16)).filter(x => (x.type || '').toUpperCase() === 'EBOOK');
+          if (!items.length) { body.innerHTML = `<tr><td colspan="5" class="empty">No e-books found</td></tr>`; return; }
+          body.innerHTML = "";
+          items.forEach(b => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${esc(b.title || 'Untitled')}<div class="muted">${esc(b.description || '')}</div></td>
+              <td>${esc(b.provider || 'Google Books')}</td>
+              <td>${esc(b.author || '')}</td>
+              <td>${b.year || ''}</td>
+              <td class="actions">${b.url ? `<button class="btn small" onclick="openNew('${b.url}')">Preview</button>` : ''}</td>`;
+            body.appendChild(tr);
+          });
+        } catch (e) {
+          console.error(e);
+          body.innerHTML = `<tr><td colspan="5" class="empty">Error fetching e-books</td></tr>`;
+        }
+      }
+      document.getElementById('bSearch').onclick = () => {
+        const q = document.getElementById('bq').value.trim();
+        if (!q) return alert('Enter a query');
+        searchBooks(q);
+      };
+      document.getElementById('bq').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('bSearch').click(); });
+    }
+
+    /* 3) Courses – certification platforms */
+    function renderCoursesPanel() {
+      const platforms = [
+        { label: 'NPTEL', desc: 'IIT video courses & exams', home: 'https://nptel.ac.in/' },
+        { label: 'SWAYAM', desc: 'Govt. of India MOOCs', home: 'https://swayam.gov.in/' },
+        { label: 'Coursera', desc: 'University & industry certificates', home: 'https://www.coursera.org/' },
+        { label: 'edX', desc: 'University-level certificates', home: 'https://www.edx.org/' },
+        { label: 'Udacity', desc: 'Nanodegree programs', home: 'https://www.udacity.com/' },
+        { label: 'Udemy', desc: 'Paid courses with certificate', home: 'https://www.udemy.com/' },
+        { label: 'Google Cloud Skills Boost', desc: 'Google cloud labs & badges', home: 'https://www.cloudskillsboost.google/' },
+        { label: 'Microsoft Learn', desc: 'Microsoft certifications & paths', home: 'https://learn.microsoft.com/training/' },
+        { label: 'AWS Skill Builder', desc: 'AWS learning & cert prep', home: 'https://skillbuilder.aws/' },
+        { label: 'IBM SkillsBuild', desc: 'Tech skills & IBM badges', home: 'https://skillsbuild.org/' },
+        { label: 'Cisco Networking Academy', desc: 'Networking & security', home: 'https://www.netacad.com/' },
+        { label: 'Linux Foundation Training', desc: 'Open-source & DevOps', home: 'https://training.linuxfoundation.org/' },
+        { label: 'Oracle University (Free)', desc: 'Oracle Cloud free training', home: 'https://education.oracle.com/learning-explorer' },
+        { label: 'Meta Blueprint', desc: 'Meta technologies certifications', home: 'https://www.facebook.com/business/learn' }
+      ];
+      panelBody.innerHTML = `
+        <div class="tiles">
+          ${platforms.map(p => `
+            <div class="tile">
+              <h4>${esc(p.label)}</h4>
+              <p class="muted">${esc(p.desc || '')}</p>
+              <div class="open"><button class="btn primary" onclick="openNew('${p.home}')">Open</button></div>
+            </div>`).join('')}
+        </div>
+      `;
+    }
+
+    /* 4) Datasets – keep search helpers */
+    function renderDatasetsPanel() {
+      const platforms = [
+        { label: 'Kaggle', home: 'https://www.kaggle.com/', search: q => `https://www.kaggle.com/search?q=${encodeURIComponent(q)}` },
+        { label: 'Google Dataset Search', home: 'https://datasetsearch.research.google.com/', search: q => `https://datasetsearch.research.google.com/search?query=${encodeURIComponent(q)}` },
+        { label: 'UCI ML Repo', home: 'https://archive.ics.uci.edu/', search: q => `https://archive.ics.uci.edu/datasets` },
+        { label: 'Data.gov', home: 'https://data.gov/', search: q => `https://catalog.data.gov/dataset?q=${encodeURIComponent(q)}` }
+      ];
+      panelBody.innerHTML = `
+        <div class="toolbar" style="gap:8px">
+          <input id="catQ" placeholder="Search datasets (optional)…"/>
+          <select id="platformSel" style="flex:0 0 260px">
+            ${platforms.map((p, i) => `<option value="${i}">${p.label}</option>`).join('')}
+          </select>
+          <button class="btn primary" id="goBtn">Search</button>
+        </div>
+        <div class="tiles">
+          ${platforms.map(p => `
+            <div class="tile">
+              <h4>${esc(p.label)}</h4>
+              <p class="muted">Open the platform or run a search with your terms.</p>
+              <div class="open"><button class="btn primary" onclick="openNew('${p.home}')">Open</button></div>
+            </div>`).join('')}
+        </div>
+      `;
+      function go() {
+        const q = document.getElementById('catQ').value.trim();
+        const idx = parseInt(document.getElementById('platformSel').value, 10) || 0;
+        const p = platforms[idx]; if (!p) return;
+        if (p.search && q) { openNew(p.search(q)); } else { openNew(p.home); }
+      }
+      document.getElementById('goBtn').onclick = go;
+      document.getElementById('catQ').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    }
+
+    /* 5) Tools – curated, no search bar */
+    function renderToolsPanel() {
+      const tools = [
+        { label: 'Google Colab', desc: 'Python notebooks in the cloud', home: 'https://colab.research.google.com/' },
+        { label: 'JupyterLite', desc: 'Jupyter in the browser (no install)', home: 'https://jupyterlite.readthedocs.io/en/latest/try/lab/' },
+        { label: 'GitHub Codespaces', desc: 'Full VS Code dev in the cloud', home: 'https://github.com/features/codespaces' },
+        { label: 'VS Code for Web', desc: 'Lightweight VS Code in browser', home: 'https://vscode.dev/' },
+        { label: 'Replit', desc: 'Instant online IDE & hosting', home: 'https://replit.com/' },
+        { label: 'CodePen', desc: 'Front-end playground', home: 'https://codepen.io/' },
+        { label: 'Postman Web', desc: 'API client & testing', home: 'https://web.postman.co/' },
+        { label: 'Docker Playground', desc: 'Try Docker in browser', home: 'https://labs.play-with-docker.com/' },
+        { label: 'Draw.io', desc: 'Diagrams & architecture', home: 'https://app.diagrams.net/' },
+        { label: 'Overleaf', desc: 'LaTeX editor for reports/papers', home: 'https://www.overleaf.com/' },
+        { label: 'SQLite Online', desc: 'Quick SQL queries', home: 'https://sqliteonline.com/' },
+        { label: 'DB Fiddle', desc: 'SQL fiddle (Postgres/MySQL/etc.)', home: 'https://www.db-fiddle.com/' },
+        { label: 'Regex101', desc: 'Test regular expressions', home: 'https://regex101.com/' },
+        { label: 'Glitch', desc: 'Prototype full-stack apps', home: 'https://glitch.com/' },
+        { label: 'Observable', desc: 'Data notebooks (JS)', home: 'https://observablehq.com/' }
+      ];
+      panelBody.innerHTML = `
+        <div class="tiles">
+          ${tools.map(t => `
+            <div class="tile">
+              <h4>${esc(t.label)}</h4>
+              <p class="muted">${esc(t.desc || '')}</p>
+              <div class="open"><button class="btn primary" onclick="openNew('${t.home}')">Open</button></div>
+            </div>`).join('')}
+        </div>
+      `;
+    }
+
+    /* 6) Websites – curated learning sites, no certification providers here */
+    function renderWebsitesPanel() {
+      const sites = [
+        { label: 'MDN Web Docs', desc: 'Authoritative web/JS docs by Mozilla', home: 'https://developer.mozilla.org/' },
+        { label: 'GeeksforGeeks', desc: 'CS articles, guides, and practice', home: 'https://www.geeksforgeeks.org/' },
+        { label: 'Stack Overflow', desc: 'Developer Q&A community', home: 'https://stackoverflow.com/' },
+        { label: 'W3Schools', desc: 'Quick references & examples', home: 'https://www.w3schools.com/' },
+        { label: 'freeCodeCamp', desc: 'Free coding curriculum & tutorials', home: 'https://www.freecodecamp.org/news/' },
+        { label: 'CS50 (Harvard)', desc: 'Intro CS course materials', home: 'https://cs50.harvard.edu/x/' },
+        { label: 'Khan Academy – Computing', desc: 'Algorithms, programming basics', home: 'https://www.khanacademy.org/computing' },
+        { label: 'TutorialsPoint', desc: 'Quick topic references', home: 'https://www.tutorialspoint.com/index.htm' },
+        { label: 'JavaTpoint', desc: 'Programming tutorials', home: 'https://www.javatpoint.com/' },
+        { label: 'roadmap.sh', desc: 'Developer roadmaps', home: 'https://roadmap.sh/' },
+        { label: 'OSSU Computer Science', desc: 'Open source CS curriculum', home: 'https://github.com/ossu/computer-science' },
+        { label: 'arXiv', desc: 'Open research papers', home: 'https://arxiv.org/' },
+        { label: 'Papers with Code', desc: 'ML papers linked to code', home: 'https://paperswithcode.com/' },
+        { label: 'LeetCode', desc: 'DSA practice', home: 'https://leetcode.com/' },
+        { label: 'HackerRank', desc: 'Coding practice & contests', home: 'https://www.hackerrank.com/' }
+      ];
+      panelBody.innerHTML = `
+        <div class="tiles">
+          ${sites.map(s => `
+            <div class="tile">
+              <h4>${esc(s.label)}</h4>
+              <p class="muted">${esc(s.desc || '')}</p>
+              <div class="open"><button class="btn primary" onclick="openNew('${s.home}')">Open</button></div>
+            </div>`).join('')}
+        </div>
+      `;
+    }
+
+    /* 7–8) Internal lists (notes/papers) */
+    async function renderInternalList(category) {
+      panelBody.innerHTML = `
+        <div class="toolbar">
+          <input id="iq" placeholder="Search title, tags, provider, authors…"/>
+          <button class="btn primary" id="iSearch">Search</button>
+          <button class="btn secondary" id="iRefresh">Refresh</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:38%">Title</th>
+                <th>Type</th>
+                <th>Provider</th>
+                <th>Author</th>
+                <th>Year</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="iBody"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      `;
+      const body = document.getElementById('iBody');
+      async function load(q) {
+        body.innerHTML = `<tr><td colspan="6" class="empty">Loading…</td></tr>`;
+        try {
+          const items = (await aggSearch(q || '', 30)).filter(x => (x.type || '') === category);
+          if (!items.length) { body.innerHTML = `<tr><td colspan="6" class="empty">No resources found</td></tr>`; return; }
+          body.innerHTML = "";
+          items.forEach(it => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${esc(it.title || 'Untitled')}<div class="muted">${esc(it.description || '')}</div></td>
+              <td>${esc(it.type || '')}</td>
+              <td>${esc(it.provider || '')}</td>
+              <td>${esc(it.author || '')}</td>
+              <td>${it.year || ''}</td>
+              <td class="actions">
+                ${it.url ? `<button class="btn small" onclick="openNew('${it.url}')">Open</button>` : ''}
+                ${it.canEdit ? `<button class="btn small" onclick='editInternal(${JSON.stringify(it).replace(/'/g, "&#39;")})'>Edit</button>
+                               <button class="btn small" onclick='deleteInternal(${it.id})'>Delete</button>` : ''}
+              </td>`;
+            body.appendChild(tr);
+          });
+        } catch (e) {
+          console.error(e);
+          body.innerHTML = `<tr><td colspan="6" class="empty">Error loading resources</td></tr>`;
+        }
+      }
+      document.getElementById('iSearch').onclick = () => load(document.getElementById('iq').value.trim());
+      document.getElementById('iRefresh').onclick = () => load('');
+      document.getElementById('iq').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('iSearch').click(); });
+      load('');
+    }
+
+    /* ---- Add / Edit / Delete (internal) ---- */
+    document.getElementById('saveAdd').onclick = async () => {
+      const body = {
+        title: v('a_title'), description: v('a_desc'), category: v('a_cat') || 'OTHER',
+        tags: v('a_tags'), authors: v('a_authors'), year: toInt(v('a_year')),
+        provider: v('a_provider'), sourceUrl: v('a_source'), downloadUrl: v('a_download'),
+        thumbnailUrl: v('a_thumb')
+      };
+      if (!body.title) { alert('Title is required'); return; }
+      await fetchJSON(API_BASE, { method: 'POST', body: JSON.stringify(body) });
+      closeModal('addModal'); alert('Saved.');
+      renderPanel();
+    };
+    window.editInternal = (r) => {
+      document.getElementById('a_title').value = r.title || '';
+      document.getElementById('a_desc').value = r.description || '';
+      document.getElementById('a_cat').value = r.type || 'OTHER';
+      document.getElementById('a_tags').value = '';
+      document.getElementById('a_authors').value = r.author || '';
+      document.getElementById('a_year').value = r.year || '';
+      document.getElementById('a_provider').value = r.provider || 'Internal';
+      document.getElementById('a_source').value = r.url || '';
+      document.getElementById('a_download').value = '';
+      document.getElementById('a_thumb').value = r.thumbnail || '';
+      openModal('addModal');
+    };
+    window.deleteInternal = async (id) => {
+      if (!confirm('Delete this resource?')) return;
+      await fetch(`${API_BASE}/${id}`, { method: 'DELETE' });
+      alert('Deleted.');
+      renderPanel();
+    };
+
+    /* initial */
+    renderPanel();
+  </script>
+</body>
+
+</html>

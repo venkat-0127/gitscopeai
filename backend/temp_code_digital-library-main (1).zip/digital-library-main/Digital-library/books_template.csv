@@ -1,0 +1,4 @@
+id,title,author,branch,year,available,rack,category,pdfPath
+,Introduction to Java,James Gosling,CSE,2022,5,A1,B.Tech,/pdfs/java.pdf
+,Advanced AI,Venkat Kumar,CSE,2023,3,B2,M.Tech,/pdfs/ai.pdf
+,Principles of Management,Dr. Smith,MBA,2021,4,C1,MBA,/pdfs/mgmt.pdf

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Newspaper Archives</title>
+  <style>
+    body { margin:0; font-family: Inter, Arial, sans-serif; background:#f7f7f7; }
+    .container { display:flex; min-height:100vh; }
+
+    /* Sidebar */
+    .sidebar { width:260px; background:#172026; color:#fff; padding:20px; box-sizing:border-box; position:sticky; top:0; align-self:flex-start; height:100vh; }
+    .sidebar h2 { margin:0 0 20px; font-size:20px; }
+    .nav { list-style:none; padding:0; margin:0 0 16px; }
+    .nav li { padding:12px; margin-bottom:8px; border-radius:8px; cursor:pointer; background:transparent; }
+    .nav li.active { background:#0b2b34; }
+    .nav li:hover { background:#0f3a46; }
+    .btn { padding:8px 12px; border:none; border-radius:8px; cursor:pointer; }
+    .btn.secondary { background:#eee; }
+
+    /* Content */
+    .content { flex:1; padding:22px; }
+    h1 { margin:0 0 12px; font-size:40px; }
+
+    /* Toolbar */
+    .toolbar { display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; }
+    .toolbar input, .toolbar select { padding:9px 10px; border:1px solid #ccc; border-radius:8px; }
+    .btn.primary { background:#f36b4f; color:#fff; }
+    .btn.ghost { background:#fff; border:1px solid #ccc; }
+
+    /* Table */
+    table { width:100%; border-collapse:collapse; background:#fff; border-radius:8px; overflow:hidden; }
+    th, td { padding:12px; border-bottom:1px solid #e6e6e6; text-align:left; }
+    th { background:#fafafa; }
+    tr:hover { background:#fafafa; }
+    .empty { text-align:center; color:#666; padding:20px; }
+
+    /* Panels */
+    .panel { display:none; }
+    .panel.active { display:block; }
+
+    /* Upload form */
+    .upload-form { background:#fff; padding:20px; border-radius:8px; max-width:600px; }
+    .upload-form label { display:block; margin-top:10px; font-weight:bold; }
+    .upload-form input, .upload-form select, .upload-form textarea { width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; margin-top:5px; }
+    .upload-form button { margin-top:15px; }
+
+    /* Trending list */
+    .trend-box { background:#fff; border:1px solid #e6e6e6; border-radius:8px; padding:12px; }
+
+    /* Responsive */
+    @media (max-width: 820px){
+      table thead { display:none; }
+      table, tbody, tr, td { display:block; width:100%; }
+      tr { margin-bottom:10px; background:#fff; border-radius:8px; border:1px solid #e6e6e6; }
+      td { border:none; border-bottom:1px solid #f0f0f0; }
+      td:last-child { border-bottom:none; }
+      td::before { content: attr(data-label); font-weight:700; display:block; margin-bottom:4px; color:#374151; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <h2>Newspaper Hub</h2>
+      <ul class="nav">
+        <li class="active" data-view="archives">Newspaper Archives</li>
+        <li data-view="trending">Trending Articles</li>
+        <li data-view="upload">Upload Newspaper</li>
+        <li data-view="saved">My Saved</li>
+      </ul>
+      <button class="btn secondary" onclick="window.location.href='/tiles'">← Back</button>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+      <h1 id="viewTitle">Newspaper Archives</h1>
+
+      <!-- ARCHIVES -->
+      <section id="panel-archives" class="panel active">
+        <div class="toolbar">
+          <input type="text" id="q" placeholder="Search by title, tags..." />
+          <select id="pub">
+            <option value="">All Publications</option>
+            <option>The Hindu</option><option>Times of India</option>
+            <option>Indian Express</option><option>The Economic Times</option>
+          </select>
+          <select id="year"><option value="">Any Year</option></select>
+          <select id="type">
+            <option value="">All Types</option>
+            <option value="epaper">E-Paper</option>
+            <option value="editorials">Editorial</option>
+            <option value="clippings">Clipping</option>
+            <option value="govt">Govt Notice</option>
+            <option value="current">Current Affairs</option>
+          </select>
+          <select id="sort">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+          <button class="btn ghost" id="btnSearch">Search</button>
+          <button class="btn primary" id="btnRefresh">Refresh</button>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th><th>Publication</th><th>Year</th><th>Type</th><th>Tags</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="newsBody"><tr><td colspan="6" class="empty">Loading...</td></tr></tbody>
+        </table>
+        <div style="text-align:center;margin-top:10px;">
+          <button class="btn ghost" id="loadMoreBtn">Load more</button>
+        </div>
+      </section>
+
+      <!-- UPLOAD -->
+      <section id="panel-upload" class="panel">
+        <div class="upload-form">
+          <h3>Upload Newspaper</h3>
+          <label>Title*</label><input id="upTitle" required />
+          <label>Publication*</label><input id="upPub" required />
+          <label>Year*</label><input id="upYear" type="number" min="1900" max="2100" required />
+          <label>Type*</label>
+          <select id="upType" required>
+            <option value="epaper">E-Paper</option>
+            <option value="editorials">Editorial</option>
+            <option value="clippings">Clipping</option>
+            <option value="govt">Govt Notice</option>
+            <option value="current">Current Affairs</option>
+          </select>
+          <label>Tags (comma separated)</label><input id="upTags" />
+          <label>Summary</label><textarea id="upSummary"></textarea>
+          <label>PDF / URL*</label><input id="upUrl" placeholder="https://..." required />
+          <button class="btn primary" onclick="uploadNews()">Upload</button>
+          <p id="uploadMsg" style="color:green;margin-top:10px;"></p>
+        </div>
+      </section>
+
+      <!-- TRENDING -->
+      <section id="panel-trending" class="panel">
+        <div class="trend-box">
+          <h3>Trending Articles</h3>
+          <div id="trendList" class="muted">Loading…</div>
+        </div>
+      </section>
+
+      <!-- SAVED -->
+      <section id="panel-saved" class="panel">
+        <div class="trend-box">
+          <h3>My Saved</h3>
+          <div id="savedList" class="muted">No saved items.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    /* ------------ Endpoints ------------- */
+    const API_ARCHIVE = "http://localhost:8083/api/newspapers";
+    const API_RSS     = "http://localhost:8083/api/rss";
+    const PAGE_SIZE   = 10;
+
+    /* ------------ State / Elements ------ */
+    let page = 0, q="", pub="", year="", type="", sort="newest";
+    const bodyEl = document.getElementById("newsBody");
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    const trendList = document.getElementById("trendList");
+    const panels = {
+      archives: document.getElementById("panel-archives"),
+      trending: document.getElementById("panel-trending"),
+      upload: document.getElementById("panel-upload"),
+      saved: document.getElementById("panel-saved"),
+    };
+
+    document.querySelectorAll(".nav li[data-view]").forEach(li => {
+      li.onclick = () => {
+        document.querySelectorAll(".nav li").forEach(x => x.classList.remove("active"));
+        li.classList.add("active");
+        const v = li.dataset.view;
+        Object.values(panels).forEach(p => p.classList.remove("active"));
+        panels[v].classList.add("active");
+        document.getElementById("viewTitle").textContent = li.textContent;
+        if (v === "archives") { page=0; load(true); }
+        if (v === "trending") loadTrending();
+        if (v === "saved") renderSaved();
+      };
+    });
+
+    /* ------------ Filters --------------- */
+    document.getElementById("btnSearch").onclick  = () => { readFilters(); page=0; load(true); };
+    document.getElementById("btnRefresh").onclick = () => { resetFilters(); page=0; load(true); };
+    document.getElementById("loadMoreBtn").onclick = () => load(false);
+
+    (function fillYears(){
+      const ysel = document.getElementById("year");
+      const y = new Date().getFullYear();
+      for (let i=0;i<20;i++){
+        const opt=document.createElement("option");
+        opt.value = (y-i); opt.textContent = (y-i);
+        ysel.appendChild(opt);
+      }
+    })();
+
+    function readFilters(){
+      q    = document.getElementById("q").value.trim();
+      pub  = document.getElementById("pub").value;
+      year = document.getElementById("year").value;
+      type = document.getElementById("type").value;
+      sort = document.getElementById("sort").value;
+    }
+    function resetFilters(){
+      document.getElementById("q").value = "";
+      document.getElementById("pub").value = "";
+      document.getElementById("year").value = "";
+      document.getElementById("type").value = "";
+      document.getElementById("sort").value = "newest";
+      readFilters();
+    }
+
+    /* ------------ Load (archive + RSS) -- */
+    async function load(clear){
+      if (clear) bodyEl.innerHTML = "<tr><td colspan='6' class='empty'>Loading...</td></tr>";
+
+      // If only keyword is provided (no other filters) → use live RSS
+      const useRss = q && !pub && !year && !type;
+
+      try{
+        if (useRss) {
+          const url = `${API_RSS}/search?q=${encodeURIComponent(q)}&limit=${PAGE_SIZE*2}`;
+          const res = await fetch(url, { credentials: "include" });
+          if (!res.ok) throw new Error("RSS search failed");
+          const items = await res.json();
+          bodyEl.innerHTML = "";
+          renderRows(items, true);
+          loadMoreBtn.style.display = "none";
+          return;
+        }
+
+        // DB archive search (paged)
+        const url = `${API_ARCHIVE}/list?q=${enc(q)}&pub=${enc(pub)}&year=${enc(year)}&type=${enc(type)}&sort=${enc(sort)}&page=${page}&size=${PAGE_SIZE}`;
+        const res = await fetch(url, { credentials: "include" });
+        if (!res.ok) throw new Error("Archive search failed");
+        const data = await res.json();
+        const items = data.content || [];
+
+        if (page===0) bodyEl.innerHTML = "";
+        if(!items.length && page===0){
+          bodyEl.innerHTML = "<tr><td colspan='6' class='empty'>No newspapers found</td></tr>";
+          loadMoreBtn.style.display="none";
+          return;
+        }
+
+        renderRows(items, false);
+        page++;
+        loadMoreBtn.style.display = (page * PAGE_SIZE >= (data.totalElements || 0)) ? "none" : "inline-block";
+      }catch(err){
+        console.error(err);
+        bodyEl.innerHTML = "<tr><td colspan='6' class='empty'>Error loading newspapers</td></tr>";
+      }
+    }
+
+    /* ---------- Helpers for links -------- */
+    function isFakeOrEmptyUrl(u){
+      if(!u) return true;
+      try{
+        const h = new URL(u).hostname.replace(/^www\./,'');
+        return h === "example.com";
+      }catch(_){
+        return true; // malformed → treat as fake
+      }
+    }
+    function buildSearchUrl(title, pub){
+      const query = [title||"", pub||""].filter(Boolean).join(" ");
+      // Google News search (works better for articles)
+      return `https://news.google.com/search?q=${encodeURIComponent(query)}&hl=en-IN&gl=IN&ceid=IN:en`;
+    }
+    function openSafe(u){ try{ window.open(u, "_blank", "noopener"); }catch(_){ } }
+
+    /* -------- Render rows (DB or RSS) --- */
+    function renderRows(items, fromRss){
+      items.forEach(n=>{
+        const tr=document.createElement("tr");
+
+        const title = esc(n.title || "Untitled");
+        const pubV  = esc(n.pub || (fromRss ? (n.source || "Web") : ""));
+        const yearV = n.year || "";
+        const typeV = esc(n.type || (fromRss ? "Web" : ""));
+        const tagsV = renderTags(n.tags);
+
+        const urlRaw = n.url || n.link || "";
+        const dlRaw  = n.downloadUrl || urlRaw;
+        const urlBad = isFakeOrEmptyUrl(urlRaw);
+        const dlBad  = isFakeOrEmptyUrl(dlRaw);
+
+        let actions = "";
+        if (!urlBad) actions += `<button class="btn ghost" onclick="openSafe('${encodeURI(urlRaw)}')">View</button> `;
+        if (!dlBad)  actions += `<button class="btn primary" onclick="openSafe('${encodeURI(dlRaw)}')">Open</button> `;
+        if (urlBad && dlBad) {
+          const searchUrl = buildSearchUrl(n.title, n.pub);
+          actions += `<button class="btn primary" onclick="openSafe('${encodeURI(searchUrl)}')">Search Web</button>`;
+        }
+
+        tr.innerHTML = `
+          <td data-label="Title">${title}</td>
+          <td data-label="Publication">${pubV}</td>
+          <td data-label="Year">${yearV}</td>
+          <td data-label="Type">${typeV}</td>
+          <td data-label="Tags">${tagsV}</td>
+          <td data-label="Actions">${actions}</td>`;
+        bodyEl.appendChild(tr);
+      });
+    }
+
+    /* ------------ Trending (LIVE RSS) --- */
+    async function loadTrending(){
+      trendList.textContent = "Loading…";
+      try{
+        // latest across curated feeds (no q = “latest”)
+        const res = await fetch(`${API_RSS}/search?limit=12`, { credentials: "include" });
+        if(!res.ok) throw new Error("RSS trending failed");
+        const list = await res.json();
+        if(!list.length){ trendList.textContent = "No trending articles."; return; }
+        trendList.innerHTML = list.map(item=>{
+          const openUrl = isFakeOrEmptyUrl(item.url) && isFakeOrEmptyUrl(item.downloadUrl)
+            ? buildSearchUrl(item.title, item.pub)
+            : (item.url || item.downloadUrl);
+          return `
+          <div style="padding:10px;border-bottom:1px solid #eee">
+            <div style="font-weight:700">${esc(item.title)}</div>
+            <div style="color:#667085">${esc(item.pub||"")} · ${item.year||""} · ${esc(item.type||"")}</div>
+            <div style="margin-top:6px">${renderTags(item.tags)}</div>
+            <div style="margin-top:8px">
+              <button class="btn primary" onclick="openSafe('${encodeURI(openUrl)}')">Open</button>
+            </div>
+          </div>`;
+        }).join("");
+      }catch(e){
+        console.error(e);
+        trendList.textContent = "Error loading trending.";
+      }
+    }
+
+    /* ------------ Saved (localStorage) -- */
+    function renderSaved(){
+      const box = document.getElementById("savedList");
+      const saved = JSON.parse(localStorage.getItem("savedNews")||"[]");
+      if(!saved.length){ box.textContent="No saved items."; return; }
+      box.innerHTML = saved.map(s=>{
+        const openUrl = isFakeOrEmptyUrl(s.url) && isFakeOrEmptyUrl(s.downloadUrl)
+          ? buildSearchUrl(s.title, s.pub)
+          : (s.url || s.downloadUrl || "");
+        return `
+        <div style="padding:10px;border-bottom:1px solid #eee">
+          <div style="font-weight:700">${esc(s.title)}</div>
+          <div style="color:#667085">${esc(s.pub||"")} · ${s.year||""} · ${esc(s.type||"")}</div>
+          <div style="margin-top:6px">${renderTags(s.tags)}</div>
+          <div style="margin-top:8px">
+            <button class="btn primary" onclick="openSafe('${encodeURI(openUrl)}')">Open</button>
+            <button class="btn" onclick="removeSaved(${JSON.stringify(s.id)})">Remove</button>
+          </div>
+        </div>`;
+      }).join("");
+    }
+    function removeSaved(id){
+      let saved = JSON.parse(localStorage.getItem("savedNews")||"[]");
+      saved = saved.filter(x=>String(x.id)!==String(id));
+      localStorage.setItem("savedNews", JSON.stringify(saved));
+      renderSaved();
+    }
+
+    /* ------------ Upload ---------------- */
+    async function uploadNews() {
+      const data = {
+        title:   document.getElementById("upTitle").value.trim(),
+        pub:     document.getElementById("upPub").value.trim(),
+        year:    parseInt(document.getElementById("upYear").value),
+        type:    document.getElementById("upType").value,
+        tags:    document.getElementById("upTags").value,
+        summary: document.getElementById("upSummary").value,
+        url:     document.getElementById("upUrl").value,
+        downloadUrl: document.getElementById("upUrl").value
+      };
+      if (!data.title || !data.pub || !data.year || !data.url) {
+        alert("Please fill all required fields!");
+        return;
+      }
+      try {
+        const res = await fetch(`${API_ARCHIVE}/upload`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+          credentials: "include"
+        });
+        const msg = document.getElementById("uploadMsg");
+        if (res.ok) {
+          msg.style.color="green";
+          msg.textContent = "✅ Uploaded successfully!";
+          setTimeout(()=>{ switchTo('archives'); }, 1200);
+        } else {
+          msg.style.color="crimson";
+          msg.textContent = "❌ Upload failed.";
+        }
+      } catch (e) {
+        const msg = document.getElementById("uploadMsg");
+        msg.style.color="crimson";
+        msg.textContent = "❌ Network error.";
+      }
+    }
+
+    /* ------------ Misc Helpers ---------- */
+    function enc(s){ return encodeURIComponent(s ?? ""); }
+    function esc(s){ return (s||"").replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m])); }
+    function renderTags(tagsStr){
+      const tags = (tagsStr||"").split(",").map(t=>t.trim()).filter(Boolean);
+      if(!tags.length) return "";
+      return tags.map(t=>`<span style="display:inline-block;background:#eef2f4;padding:4px 8px;border-radius:999px;margin:2px;font-size:12px">${esc(t)}</span>`).join("");
+    }
+    function switchTo(name){
+      document.querySelectorAll(".nav li").forEach(x=>x.classList.remove("active"));
+      document.querySelector(`.nav li[data-view="${name}"]`)?.classList.add("active");
+      Object.values(panels).forEach(p => p.classList.remove("active"));
+      panels[name].classList.add("active");
+      document.getElementById("viewTitle").textContent =
+        document.querySelector(`.nav li[data-view="${name}"]`)?.textContent || "Newspaper Archives";
+      if (name === "archives") { page=0; load(true); }
+      if (name === "trending") loadTrending();
+      if (name === "saved") renderSaved();
+    }
+
+    /* Boot */
+    switchTo("archives");
+  </script>
+</body>
+</html>

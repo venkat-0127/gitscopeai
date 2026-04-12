@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Trending AI Tools (2025)</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #121833;
+      --ink: #e8edff;
+      --muted: #a6b0d8;
+      --brand: #6ea8ff;
+      --accent: #8ef0c5;
+      --ring: #3953b4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #080d1a, #0b1020 40%, #0c0f1f);
+      color: var(--ink);
+      font: 500 15px/1.5 "Segoe UI", Roboto, sans-serif;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Layout */
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: #121a46;
+      border: 1px solid #2a3777;
+      border-radius: 10px;
+      color: #e8edff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .back-btn:hover {
+      background: #1b2760;
+      transform: translateY(-2px);
+    }
+
+    .title {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .title h1 {
+      font-size: clamp(18px, 4vw, 26px);
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .input {
+      background: #0d1330;
+      border: 1px solid #242f6b;
+      color: var(--ink);
+      padding: 10px 12px;
+      border-radius: 12px;
+      min-width: 220px;
+      outline: none;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: #0d1330;
+      border: 1px solid #242f6b;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .switch {
+      width: 36px;
+      height: 22px;
+      background: #1a2452;
+      border-radius: 999px;
+      position: relative;
+      transition: 0.2s background;
+    }
+
+    .knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #cbd7ff;
+      transition: 0.2s left;
+    }
+
+    .switch.on {
+      background: #1f794d;
+    }
+
+    .switch.on .knob {
+      left: 16px;
+      background: white;
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .chip {
+      padding: 6px 10px;
+      border: 1px solid #2a3777;
+      background: #0e1540;
+      border-radius: 999px;
+      color: #cfe0ff;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      background: #19306b;
+      border-color: #3f5cd3;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, #111739, #0e1534);
+      border: 1px solid #22306a;
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px #040713;
+    }
+
+    .badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 11px;
+      color: #072b1e;
+      background: linear-gradient(135deg, #8ef0c5, #b6ffe5);
+      border: 1px solid #8ef0c5AA;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      display: none;
+    }
+
+    .badge.show {
+      display: inline-block;
+    }
+
+    .head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .favicon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: #0b122f;
+      border: 1px solid #22306a;
+    }
+
+    .name {
+      font-weight: 700;
+    }
+
+    .tag {
+      font-size: 11px;
+      color: #9fb1ff;
+      border: 1px dashed #3346a6;
+      padding: 2px 6px;
+      border-radius: 999px;
+      margin-left: auto;
+    }
+
+    .features {
+      margin: 2px 0 6px;
+      padding-left: 16px;
+      color: #cdd7ff;
+    }
+
+    .features li {
+      margin: 4px 0;
+    }
+
+    .cta {
+      margin-top: auto;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #2a3777;
+      background: #121a46;
+      color: #e8edff;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #203a8b, #1b2e6c);
+      border-color: #3e58bf;
+    }
+
+    .btn.ghost {
+      background: transparent;
+    }
+
+    .footer {
+      margin-top: 20px;
+      color: #93a2dd;
+      font-size: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <button class="back-btn" onclick="window.location.href='/tiles'">← Back to Tiles</button>
+      <div class="title">
+        <h1>Trending AI Tools • 2025</h1>
+        <div class="subtitle">These AI tools are built to supercharge your productivity in 2025.</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <input id="search" class="input" placeholder="Search tools or features..." />
+      <div id="studentToggle" class="toggle" role="switch" aria-checked="false" tabindex="0">
+        <div class="switch" id="switch"><span class="knob"></span></div>
+        <span>Student Mode</span>
+      </div>
+    </div>
+
+    <div class="chips" id="chips">
+      <button class="chip active" data-cat="all">All</button>
+      <button class="chip" data-cat="Design">Design</button>
+      <button class="chip" data-cat="Writing">Writing</button>
+      <button class="chip" data-cat="Video">Video</button>
+      <button class="chip" data-cat="Audio">Audio</button>
+      <button class="chip" data-cat="Presentations">Presentations</button>
+      <button class="chip" data-cat="Music">Music</button>
+      <button class="chip" data-cat="3D">3D</button>
+    </div>
+
+    <section class="grid" id="grid"></section>
+
+    <p class="footer">
+      Tip: Turn on <strong>Student Mode</strong> to highlight beginner-friendly, study-focused picks.
+    </p>
+  </div>
+
+  <script>
+    const tools = [
+      { name: "Krea.ai", url: "https://krea.ai", cat: ["Design"], tagline: "Create logos fast", features: ["Logo & brand marks", "AI variations", "Export transparent SVG/PNG"], studentPick: false, icon: "🎨" },
+      { name: "ChatGPT.com", url: "https://chat.openai.com", cat: ["Writing", "Presentations", "Audio", "Video", "Design"], tagline: "Answers (almost) everything", features: ["Research & summaries", "Code help & debugging", "Study plans & explanations"], studentPick: true, icon: "💡" },
+      { name: "Runway.ml", url: "https://runwayml.com", cat: ["Video"], tagline: "Video edits & gen", features: ["Text-to-video", "Green screen & remove bg", "Smart cut & captions"], studentPick: false, icon: "🎬" },
+      { name: "ElevenLabs.io", url: "https://elevenlabs.io", cat: ["Audio"], tagline: "Voice cloning", features: ["Clone voices ethically", "Multilingual TTS", "Emotion & style controls"], studentPick: false, icon: "🗣️" },
+      { name: "Relume.io", url: "https://relume.io", cat: ["Design"], tagline: "Web design systems", features: ["AI sitemap & wireframes", "Component library", "Export to Webflow/Figma"], studentPick: false, icon: "🧩" },
+      { name: "Fliki.ai", url: "https://fliki.ai", cat: ["Audio", "Video"], tagline: "Voiceover & shorts", features: ["Realistic TTS", "Auto subtitles", "Fast reels & explainers"], studentPick: true, icon: "🎙️" },
+      { name: "Gamma.app", url: "https://gamma.app", cat: ["Presentations", "Writing"], tagline: "Document design", features: ["Slide/Doc from prompt", "Clean academic templates", "One-click export"], studentPick: true, icon: "📄" },
+      { name: "Suno.ai", url: "https://suno.ai", cat: ["Music"], tagline: "Make music", features: ["Lyrics + melody from prompt", "Multiple styles", "Fast MP3 export"], studentPick: false, icon: "🎵" },
+      { name: "Tome.app", url: "https://tome.app", cat: ["Presentations"], tagline: "Quick presentations", features: ["Idea → deck in minutes", "Embeds & web content", "Presenter notes"], studentPick: true, icon: "🗂️" },
+      { name: "Descript.com", url: "https://www.descript.com", cat: ["Audio", "Video"], tagline: "Audio editing", features: ["Edit by text transcript", "Remove filler words", "Screen + webcam recorder"], studentPick: true, icon: "🎧" },
+      { name: "PicWish.com", url: "https://picwish.com", cat: ["Design"], tagline: "Photo edits", features: ["Background remover", "Upscale & sharpen", "Batch editing"], studentPick: false, icon: "🖼️" },
+      { name: "RecCloud.com", url: "https://reccloud.com", cat: ["Audio"], tagline: "Instant voice", features: ["Quick voice gen", "Fast presets", "Simple UI"], studentPick: false, icon: "⚡" },
+      { name: "Pika.art", url: "https://pika.art", cat: ["Video"], tagline: "AI video", features: ["Text→video animation", "Styles & effects", "Upscaling"], studentPick: false, icon: "🎞️" },
+      { name: "LumaLabs.ai", url: "https://lumalabs.ai", cat: ["3D"], tagline: "3D models", features: ["Text/Video→3D", "Realistic materials", "GLTF/OBJ export"], studentPick: false, icon: "🧱" }
+    ];
+
+    const grid = document.getElementById("grid");
+    const search = document.getElementById("search");
+    const chips = document.getElementById("chips");
+    const studentToggle = document.getElementById("studentToggle");
+    const switchEl = document.getElementById("switch");
+    let activeCat = "all";
+    let studentMode = false;
+
+    function matches(tool, q) {
+      if (!q) return true;
+      const hay = (tool.name + " " + tool.tagline + " " + tool.features.join(" ") + " " + tool.cat.join(" ")).toLowerCase();
+      return hay.includes(q.toLowerCase());
+    }
+
+    function categoryOk(tool) {
+      if (activeCat === "all") return true;
+      return tool.cat.includes(activeCat);
+    }
+
+    function card(tool) {
+      const features = tool.features.map(f => `<li>${f}</li>`).join("");
+      return `
+        <article class="card">
+          <span class="badge ${studentMode && tool.studentPick ? 'show' : ''}">Best for Students</span>
+          <div class="head">
+            <div class="favicon"><span>${tool.icon}</span></div>
+            <div class="name">${tool.name}</div>
+            <span class="tag">${tool.cat[0]}</span>
+          </div>
+          <div style="color:#bfcaff">${tool.tagline}</div>
+          <ul class="features">${features}</ul>
+          <div class="cta">
+            <a class="btn primary" href="${tool.url}" target="_blank">Open site</a>
+          </div>
+        </article>`;
+    }
+
+    function render() {
+      const q = search.value.trim();
+      const html = tools
+        .filter(t => matches(t, q) && categoryOk(t))
+        .sort((a, b) => Number(b.studentPick && studentMode) - Number(a.studentPick && studentMode))
+        .map(card)
+        .join("");
+      grid.innerHTML = html || `<div style="grid-column:1/-1;color:#aab6ee;text-align:center">No tools found.</div>`;
+    }
+
+    search.addEventListener("input", render);
+
+    chips.addEventListener("click", (e) => {
+      const btn = e.target.closest(".chip");
+      if (!btn) return;
+      [...chips.children].forEach(c => c.classList.remove("active"));
+      btn.classList.add("active");
+      activeCat = btn.dataset.cat;
+      render();
+    });
+
+    function toggleStudent() {
+      studentMode = !studentMode;
+      switchEl.classList.toggle("on", studentMode);
+      studentToggle.setAttribute("aria-checked", String(studentMode));
+      render();
+    }
+
+    studentToggle.addEventListener("click", toggleStudent);
+    studentToggle.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleStudent();
+      }
+    });
+
+    render();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Research Repository</title>
+  <style>
+    :root {
+      --bg: #f7f7f7;
+      --panel: #ffffff;
+      --muted: #6b6b6b;
+      --accent: #f36b4f;
+      --muted-border: #ddd;
+      --text: #2b2b2b;
+      --radius: 8px;
+      --gap: 14px;
+      --max-width: 1100px;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 240px;
+      background: #172026;
+      color: #fff;
+      padding: 22px;
+      box-sizing: border-box;
+      flex-shrink: 0
+    }
+
+    .sidebar h2 {
+      margin: 0 0 18px;
+      font-size: 18px
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0
+    }
+
+    .sidebar ul li {
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer
+    }
+
+    .sidebar ul li.active {
+      background: #0b2b34
+    }
+
+    .sidebar .back {
+      margin-top: 12px;
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: #eee;
+      color: #333;
+      border: none;
+      cursor: pointer
+    }
+
+    main.content {
+      flex: 1;
+      padding: 28px;
+      max-width: var(--max-width);
+      margin: 0 auto
+    }
+
+    h1 {
+      font-size: 28px;
+      margin: 0 0 12px
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap
+    }
+
+    .toolbar input[type="search"] {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--muted-border);
+      font-size: 14px
+    }
+
+    .toolbar .controls {
+      display: flex;
+      gap: 10px
+    }
+
+    .btn {
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: #eee;
+      cursor: pointer;
+      font-weight: 700
+    }
+
+    .btn:disabled {
+      opacity: .6;
+      cursor: not-allowed
+    }
+
+    .btn.primary {
+      background: linear-gradient(90deg, var(--accent), #cc5b3f);
+      color: #fff;
+      border: none
+    }
+
+    .btn.ghost {
+      background: #fff;
+      border: 1px solid var(--muted-border)
+    }
+
+    .meta {
+      color: var(--muted);
+      margin-bottom: 12px;
+      font-size: 14px
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(10, 20, 40, 0.04)
+    }
+
+    thead th {
+      background: #fafafa;
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--muted-border);
+      font-weight: 700;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--muted-border);
+      vertical-align: top;
+      font-size: 14px
+    }
+
+    tr:hover td {
+      background: #fbfbfb
+    }
+
+    .actions button {
+      margin-right: 8px
+    }
+
+    .center {
+      text-align: center;
+      color: var(--muted);
+      padding: 22px
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .load-more-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 14px;
+      background: transparent
+    }
+
+    /* modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 60
+    }
+
+    .modal {
+      background: #fff;
+      border-radius: 10px;
+      max-width: 680px;
+      width: 94%;
+      padding: 18px;
+      box-shadow: 0 8px 30px rgba(5, 10, 20, .25)
+    }
+
+    .modal h3 {
+      margin: 0 0 8px
+    }
+
+    .modal .meta-row {
+      margin: 6px 0;
+      color: var(--muted)
+    }
+
+    .modal .close {
+      float: right;
+      border: none;
+      background: transparent;
+      font-weight: 700;
+      font-size: 18px;
+      cursor: pointer
+    }
+
+    @media (max-width:900px) {
+      .page {
+        flex-direction: column
+      }
+
+      .sidebar {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        align-items: center
+      }
+
+      .sidebar ul {
+        display: flex;
+        gap: 8px
+      }
+
+      .sidebar ul li {
+        padding: 8px 10px
+      }
+
+      main.content {
+        padding: 18px
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch
+      }
+
+      .toolbar .controls {
+        justify-content: space-between
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page" role="application">
+    <aside class="sidebar" aria-label="Research sidebar">
+      <h2>Research Hub</h2>
+      <ul>
+        <li id="repoNav" class="active" aria-current="true">Research Repository</li>
+        <li id="uploadNav" role="button" tabindex="0">Upload Papers</li>
+        <li id="mySubsNav" role="button" tabindex="0">My Submissions</li>
+        <li id="discoverNav" role="button" tabindex="0">Discover Papers</li>
+      </ul>
+
+      <button class="back" onclick="location.href='/tiles'">← Back</button>
+    </aside>
+
+    <main class="content" role="main">
+      <h1>Research Repository</h1>
+      <div class="meta" id="metaInfo">Loading…</div>
+
+      <div class="toolbar" role="search" aria-label="Search papers">
+        <input id="searchBox" type="search" placeholder="Search title, authors, tags..." aria-label="Search papers">
+        <div class="controls">
+          <button id="searchBtn" class="btn ghost">Search</button>
+          <button id="refreshBtn" class="btn primary">Refresh</button>
+        </div>
+      </div>
+
+      <div style="overflow:auto">
+        <table role="table" aria-describedby="metaInfo">
+          <thead>
+            <tr>
+              <th scope="col">Title</th>
+              <th scope="col">Authors</th>
+              <th scope="col">Year</th>
+              <th scope="col">Tags</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="papersBody">
+            <tr>
+              <td colspan="5" class="center">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="load-more-wrap">
+        <button id="loadMoreBtn" class="btn ghost">Load more</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- lightweight modal (hidden by default) -->
+  <div id="modalRoot" style="display:none"></div>
+
+  <script>
+    // CONFIG - change if your backend runs elsewhere
+    const API_BASE = "http://localhost:8083/api/research";
+    const EXTERNAL_BASE = "http://localhost:8083/api/external";
+    const PAGE_SIZE = 10;
+    const CURRENT_USER = window.CURRENT_USER || null; // if your app exposes a username
+
+    // DOM refs
+    const bodyEl = document.getElementById('papersBody');
+    const searchBox = document.getElementById('searchBox');
+    const searchBtn = document.getElementById('searchBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const metaInfo = document.getElementById('metaInfo');
+    const modalRoot = document.getElementById('modalRoot');
+
+    // state
+    let page = 0;
+    let query = '';
+    let totalElements = 0;
+    let loading = false;
+    let debounceTimer = null;
+
+    // events
+    searchBtn.addEventListener('click', () => { page = 0; query = searchBox.value.trim(); load(true); });
+    refreshBtn.addEventListener('click', () => { page = 0; query = ''; searchBox.value = ''; load(true); });
+    loadMoreBtn.addEventListener('click', () => load(false));
+    searchBox.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); page = 0; query = searchBox.value.trim(); load(true); }
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        if (searchBox.value.trim().length > 2) {
+          page = 0; query = searchBox.value.trim(); load(true);
+        }
+      }, 450);
+    });
+
+    // main list loader
+    async function load(clear = false) {
+      if (loading) return;
+      loading = true;
+      if (clear) {
+        bodyEl.innerHTML = '<tr><td colspan="5" class="center">Loading...</td></tr>';
+        loadMoreBtn.style.display = 'none';
+        metaInfo.textContent = 'Loading…';
+        page = 0;
+      } else {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.textContent = 'Loading...';
+      }
+
+      try {
+        const url = `${API_BASE}/list?q=${encodeURIComponent(query || '')}&page=${page}&size=${PAGE_SIZE}`;
+        const res = await fetch(url, { credentials: 'same-origin' });
+        if (!res.ok) throw new Error('Network response was not ok: ' + res.status);
+        const data = await res.json();
+        const items = Array.isArray(data.content) ? data.content : [];
+        totalElements = Number(data.totalElements || 0);
+
+        if (page === 0) bodyEl.innerHTML = '';
+
+        if (!items.length && page === 0) {
+          bodyEl.innerHTML = '<tr><td colspan="5" class="center">No papers found</td></tr>';
+          metaInfo.textContent = `0 results`;
+          loadMoreBtn.style.display = 'none';
+          return;
+        }
+
+        items.forEach(p => {
+          const downloadUrl = p.downloadUrl || `${API_BASE}/download/${p.id}`;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${escapeHtml(p.title || 'Untitled')}</td>
+            <td class="small">${escapeHtml(p.authors || '')}</td>
+            <td>${escapeHtml(p.year || '')}</td>
+            <td class="small">${escapeHtml(p.tags || '')}</td>
+            <td class="actions">
+              <button class="btn ghost" onclick="openPaper('${p.id}')">View</button>
+              <button class="btn ghost" onclick="downloadPaperUrl('${encodeURI(downloadUrl)}')">Download</button>
+            </td>
+          `;
+          bodyEl.appendChild(tr);
+        });
+
+        const shown = Math.min((page + 1) * PAGE_SIZE, totalElements || (page + 1) * PAGE_SIZE);
+        metaInfo.textContent = (totalElements ? `${shown} of ${totalElements} papers` : `${shown} papers loaded`);
+
+        page++;
+        if (totalElements && page * PAGE_SIZE >= totalElements) {
+          loadMoreBtn.style.display = 'none';
+        } else {
+          loadMoreBtn.style.display = 'inline-block';
+          loadMoreBtn.disabled = false;
+          loadMoreBtn.textContent = 'Load more';
+        }
+
+      } catch (err) {
+        console.error('Load error', err);
+        if (page === 0) {
+          bodyEl.innerHTML = '<tr><td colspan="5" class="center" style="color:#c33">Error loading papers</td></tr>';
+          metaInfo.textContent = 'Error loading results';
+        } else {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td colspan="5" class="center" style="color:#c33">Error loading more papers</td>`;
+          bodyEl.appendChild(tr);
+          loadMoreBtn.style.display = 'none';
+        }
+      } finally {
+        loading = false;
+      }
+    }
+
+    // open metadata modal (GET /api/research/{id})
+    async function openPaper(id) {
+      if (!id) return alert('Invalid paper id');
+      try {
+        const res = await fetch(`${API_BASE}/${encodeURIComponent(id)}`, { credentials: 'same-origin' });
+        if (!res.ok) {
+          if (res.status === 404) return alert('Paper not found');
+          throw new Error('Failed to fetch metadata: ' + res.status);
+        }
+        const p = await res.json();
+        showModal(p);
+      } catch (err) {
+        console.error(err);
+        alert('Could not load paper details');
+      }
+    }
+
+    // helper to trigger download/open
+    function downloadPaperUrl(url) {
+      if (!url) return alert('No URL');
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    // simple modal builder for paper metadata
+    function showModal(p) {
+      modalRoot.innerHTML = `
+        <div class="modal-backdrop" id="modalBackdrop">
+          <div class="modal" role="dialog" aria-modal="true">
+            <button class="close" id="modalClose" aria-label="Close">&times;</button>
+            <h3>${escapeHtml(p.title || 'Untitled')}</h3>
+            <div class="meta-row"><strong>Authors:</strong> ${escapeHtml(p.authors || '')}</div>
+            <div class="meta-row"><strong>Year:</strong> ${escapeHtml(p.year || '')}</div>
+            <div class="meta-row"><strong>Tags:</strong> ${escapeHtml(p.tags || '')}</div>
+            <div class="meta-row"><strong>Filename:</strong> ${escapeHtml(p.originalFilename || p.filename || '')}</div>
+            <div class="meta-row"><strong>Size:</strong> ${p.sizeBytes ? (Math.round(p.sizeBytes / 1024) + ' KB') : '—'}</div>
+            <div class="meta-row"><strong>Uploaded By:</strong> ${escapeHtml(p.uploadedBy || '—')}</div>
+            <div style="margin-top:14px;display:flex;gap:8px;">
+              <button class="btn primary" id="modalDownload">Download</button>
+              <button class="btn ghost" id="modalClose2">Close</button>
+            </div>
+          </div>
+        </div>
+      `;
+      modalRoot.style.display = 'block';
+      const backdrop = document.getElementById('modalBackdrop');
+      const close = document.getElementById('modalClose');
+      const close2 = document.getElementById('modalClose2');
+      const dd = document.getElementById('modalDownload');
+
+      const downloadUrl = p.downloadUrl || `${API_BASE}/download/${p.id}`;
+      dd.addEventListener('click', () => downloadPaperUrl(downloadUrl));
+      close.addEventListener('click', hideModal);
+      close2.addEventListener('click', hideModal);
+      backdrop.addEventListener('click', (ev) => { if (ev.target === backdrop) hideModal(); });
+    }
+
+    function hideModal() {
+      modalRoot.innerHTML = '';
+      modalRoot.style.display = 'none';
+    }
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, function (m) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]);
+      });
+    }
+
+    // ============ Upload UI =============
+    function openUploadModal() {
+      const html = `
+        <div class="modal-backdrop" id="modalBackdropUpload">
+          <div class="modal" role="dialog" aria-modal="true">
+            <button class="close" id="uploadModalClose">&times;</button>
+            <h3>Upload Research Paper</h3>
+            <form id="uploadForm">
+              <div style="margin:8px 0">
+                <label>Title<br/><input name="title" required style="width:100%;padding:8px;border-radius:6px;border:1px solid #ddd"></label>
+              </div>
+              <div style="margin:6px 0">
+                <label>Authors (comma separated)<br/><input name="authors" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ddd"></label>
+              </div>
+              <div style="display:flex;gap:8px">
+                <label style="flex:1">Year<br/><input name="year" type="number" min="1900" max="2100" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ddd"></label>
+                <label style="flex:1">Tags<br/><input name="tags" placeholder="ml,nlp" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ddd"></label>
+              </div>
+              <div style="margin:8px 0">
+                <label>File (PDF)<br/><input id="uploadFileInput" name="file" type="file" accept="application/pdf" required></label>
+              </div>
+              <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+                <button type="button" id="uploadCancel" class="btn ghost">Cancel</button>
+                <button type="submit" id="uploadSubmit" class="btn primary">Upload</button>
+              </div>
+              <div id="uploadStatus" style="margin-top:8px;color:var(--muted)"></div>
+            </form>
+          </div>
+        </div>
+      `;
+      modalRoot.innerHTML = html;
+      modalRoot.style.display = 'block';
+
+      document.getElementById('uploadModalClose').addEventListener('click', hideModal);
+      document.getElementById('uploadCancel').addEventListener('click', hideModal);
+      const form = document.getElementById('uploadForm');
+      form.addEventListener('submit', submitUploadForm);
+    }
+
+    async function submitUploadForm(e) {
+      e.preventDefault();
+      const statusEl = document.getElementById('uploadStatus');
+      const form = e.target;
+      const fd = new FormData();
+
+      const title = form.title.value.trim();
+      if (!title) { statusEl.textContent = 'Title is required'; return; }
+      fd.append('title', title);
+      if (form.authors.value) fd.append('authors', form.authors.value.trim());
+      if (form.year.value) fd.append('year', form.year.value.trim());
+      if (form.tags.value) fd.append('tags', form.tags.value.trim());
+
+      const fileInput = document.getElementById('uploadFileInput');
+      if (!fileInput.files || fileInput.files.length === 0) {
+        statusEl.textContent = 'Select a PDF file to upload';
+        return;
+      }
+      const file = fileInput.files[0];
+      fd.append('file', file);
+
+      let uploadedBy = CURRENT_USER;
+      if (!uploadedBy) {
+        uploadedBy = prompt('Enter uploader id (email or username):');
+      }
+      if (uploadedBy) fd.append('uploadedBy', uploadedBy);
+
+      const submitBtn = document.getElementById('uploadSubmit');
+      submitBtn.disabled = true;
+      statusEl.textContent = 'Uploading...';
+
+      try {
+        const res = await fetch(`${API_BASE}/upload`, {
+          method: 'POST',
+          body: fd,
+          credentials: 'same-origin'
+        });
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error('Upload failed: ' + res.status + ' ' + text);
+        }
+        await res.json();
+        statusEl.textContent = 'Upload successful';
+        hideModal();
+        page = 0; query = ''; searchBox.value = '';
+        load(true);
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = 'Upload error: ' + (err.message || err);
+        submitBtn.disabled = false;
+      }
+    }
+
+    // ============ My Submissions (with Edit/Delete) ============
+    async function openMySubmissions() {
+      let uploadedBy = CURRENT_USER;
+      if (!uploadedBy) {
+        uploadedBy = prompt('Enter your uploader id (email or username) to list your submissions:');
+        if (!uploadedBy) return;
+      }
+
+      modalRoot.innerHTML = `<div class="modal-backdrop" id="modalBackdropMS"><div class="modal"><h3>My Submissions</h3><div id="mySubsContent">Loading…</div><div style="margin-top:12px;text-align:right"><button class="btn ghost" id="closeMySubs">Close</button></div></div></div>`;
+      modalRoot.style.display = 'block';
+      document.getElementById('closeMySubs').addEventListener('click', hideModal);
+
+      try {
+        const res = await fetch(`${API_BASE}/my-submissions?uploadedBy=${encodeURIComponent(uploadedBy)}&page=0&size=200`, { credentials: 'same-origin' });
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error('Failed to load: ' + res.status + ' ' + txt);
+        }
+        const pageResp = await res.json();
+        const content = Array.isArray(pageResp.content) ? pageResp.content : [];
+        const el = document.getElementById('mySubsContent');
+        if (!content.length) {
+          el.innerHTML = '<div class="center">No submissions found</div>';
+          return;
+        }
+
+        const rows = content.map(p => {
+          const dl = p.downloadUrl || `${API_BASE}/download/${p.id}`;
+          return `
+          <div id="ms-row-${p.id}" style="border-bottom:1px solid #eee;padding:8px 0">
+            <div style="font-weight:700">${escapeHtml(p.title || 'Untitled')}</div>
+            <div class="small">${escapeHtml(p.authors || '')} • ${escapeHtml(p.year || '')}</div>
+            <div style="margin-top:6px">
+              <button class="btn ghost" onclick="openPaper('${p.id}')">View</button>
+              <button class="btn ghost" onclick="downloadPaperUrl('${encodeURI(dl)}')">Download</button>
+              <button class="btn ghost" onclick="openEditModal('${p.id}', ${JSON.stringify(escapeForInline(p.title || ''))}, ${JSON.stringify(escapeForInline(p.authors || ''))}, ${p.year ? p.year : 'null'}, ${JSON.stringify(escapeForInline(p.tags || ''))})">Edit</button>
+              <button class="btn" style="background:#fdd; border:1px solid #f99;" onclick="deleteSubmission('${p.id}')">Delete</button>
+            </div>
+          </div>
+        `;
+        }).join('');
+        el.innerHTML = rows;
+      } catch (err) {
+        console.error(err);
+        document.getElementById('mySubsContent').innerHTML = `<div class="center" style="color:#c33">Error loading submissions: ${escapeHtml(String(err.message))}</div>`;
+      }
+    }
+
+    function escapeForInline(s) {
+      return (s || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n');
+    }
+
+    async function deleteSubmission(id) {
+      if (!confirm('Delete this submission? This action cannot be undone.')) return;
+      try {
+        const res = await fetch(`${API_BASE}/${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+          credentials: 'same-origin'
+        });
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error('Delete failed: ' + res.status + ' ' + txt);
+        }
+        const row = document.getElementById('ms-row-' + id);
+        if (row) row.remove();
+        alert('Deleted');
+        page = 0; query = ''; searchBox.value = '';
+        load(true);
+      } catch (err) {
+        console.error(err);
+        alert('Delete failed: ' + err.message);
+      }
+    }
+
+    function openEditModal(id, title, authors, year, tags) {
+      const html = `
+        <div class="modal-backdrop" id="editBackdrop">
+          <div class="modal" role="dialog" aria-modal="true">
+            <button class="close" id="editClose">&times;</button>
+            <h3>Edit Paper</h3>
+            <form id="editForm">
+              <div style="margin:8px 0">
+                <label>Title<br/><input name="title" required style="width:100%;padding:8px;border-radius:6px;border:1px solid #ddd" value="${escapeHtml(title)}"></label>
+              </div>
+              <div style="margin:6px 0">
+                <label>Authors<br/><input name="authors" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ddd" value="${escapeHtml(authors)}"></label>
+              </div>
+              <div style="display:flex;gap:8px">
+                <label style="flex:1">Year<br/><input name="year" type="number" min="1900" max="2100" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ddd" value="${year ? year : ''}"></label>
+                <label style="flex:1">Tags<br/><input name="tags" placeholder="ml,nlp" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ddd" value="${escapeHtml(tags)}"></label>
+              </div>
+              <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+                <button type="button" id="editCancel" class="btn ghost">Cancel</button>
+                <button type="submit" id="editSubmit" class="btn primary">Save</button>
+              </div>
+              <div id="editStatus" style="margin-top:8px;color:var(--muted)"></div>
+            </form>
+          </div>
+        </div>
+      `;
+      modalRoot.innerHTML = html;
+      modalRoot.style.display = 'block';
+      document.getElementById('editClose').addEventListener('click', hideModal);
+      document.getElementById('editCancel').addEventListener('click', hideModal);
+      const form = document.getElementById('editForm');
+      form.addEventListener('submit', (e) => submitEditForm(e, id));
+    }
+
+    async function submitEditForm(e, id) {
+      e.preventDefault();
+      const statusEl = document.getElementById('editStatus');
+      const form = e.target;
+      const payload = {
+        title: form.title.value.trim(),
+        authors: form.authors.value.trim(),
+        tags: form.tags.value.trim(),
+        year: form.year.value ? Number(form.year.value) : null
+      };
+      document.getElementById('editSubmit').disabled = true;
+      statusEl.textContent = 'Saving...';
+      try {
+        const res = await fetch(`${API_BASE}/${encodeURIComponent(id)}`, {
+          method: 'PUT',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error('Update failed: ' + res.status + ' ' + txt);
+        }
+        await res.json();
+        statusEl.textContent = 'Saved';
+        hideModal();
+        page = 0; query = ''; searchBox.value = ''; load(true);
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = 'Update error: ' + err.message;
+        document.getElementById('editSubmit').disabled = false;
+      }
+    }
+
+    // ============ Discover (CrossRef / arXiv) ============
+    function openDiscoverModal() {
+      modalRoot.innerHTML = `
+        <div class="modal-backdrop" id="discoverBackdrop">
+          <div class="modal" role="dialog" aria-modal="true">
+            <button class="close" id="discoverClose">&times;</button>
+            <h3>Discover Papers (CrossRef / arXiv / Semantic)</h3>
+            <div style="display:flex;gap:8px;margin:8px 0">
+              <input id="discoverQuery" placeholder="Search e.g. neural networks" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px">
+              <select id="discoverSource"><option value="crossref">CrossRef</option><option value="arxiv">arXiv</option><option value="semantic">Semantic</option></select>
+              <button id="discoverSearch" class="btn primary">Search</button>
+            </div>
+            <div id="discoverResults" style="max-height:360px;overflow:auto">Enter a query and press Search</div>
+            <div style="text-align:right;margin-top:8px"><button class="btn ghost" id="discoverClose2">Close</button></div>
+          </div>
+        </div>
+      `;
+      modalRoot.style.display = 'block';
+      document.getElementById('discoverClose').addEventListener('click', hideModal);
+      document.getElementById('discoverClose2').addEventListener('click', hideModal);
+      document.getElementById('discoverSearch').addEventListener('click', async () => {
+        const q = document.getElementById('discoverQuery').value.trim();
+        if (!q) return alert('Enter search query');
+        const source = document.getElementById('discoverSource').value;
+        const resultsEl = document.getElementById('discoverResults');
+        resultsEl.innerHTML = '<div class="center">Searching…</div>';
+        try {
+          const res = await fetch(`${EXTERNAL_BASE}/${source}?q=${encodeURIComponent(q)}&rows=12`, { credentials: 'same-origin' });
+          if (!res.ok) throw new Error('Search failed: ' + res.status);
+          const list = await res.json();
+          if (!Array.isArray(list) || list.length === 0) { resultsEl.innerHTML = '<div class="center">No results</div>'; return; }
+          resultsEl.innerHTML = list.map(item => `
+            <div style="padding:8px;border-bottom:1px solid #eee">
+              <div style="font-weight:700">${escapeHtml(item.title || 'Untitled')}</div>
+              <div class="small">${escapeHtml(item.authors || '')} • ${escapeHtml(item.year || '')}</div>
+              <div style="margin-top:8px">
+                <button class="btn ghost" onclick='openExternal("${encodeURIComponent(JSON.stringify(item))}")'>Preview</button>
+                <button class="btn primary" onclick='importExternal("${encodeURIComponent(JSON.stringify(item))}")'>Import</button>
+                <a class="btn ghost" href="${encodeURI(item.pdfUrl || item.url || '#')}" target="_blank" rel="noopener">Open source</a>
+              </div>
+            </div>
+          `).join('');
+        } catch (err) {
+          resultsEl.innerHTML = `<div class="center" style="color:#c33">Search error: ${escapeHtml(String(err.message))}</div>`;
+        }
+      });
+    }
+
+    // preview external result (shows same modal but with uploadedBy = external)
+    window.openExternal = function (payload) {
+      try {
+        const item = JSON.parse(decodeURIComponent(payload));
+        showModal({
+          id: item.id || item.url,
+          title: item.title,
+          authors: item.authors,
+          year: item.year,
+          tags: item.source,
+          originalFilename: item.pdfUrl || item.url,
+          sizeBytes: null,
+          uploadedBy: 'external',
+          downloadUrl: item.pdfUrl || item.url
+        });
+      } catch (e) { alert('Preview failed') }
+    };
+
+    // import external -> calls the external import endpoint (backend will save metadata; set downloadPdf param if you want)
+    window.importExternal = async function (payload) {
+      try {
+        const item = JSON.parse(decodeURIComponent(payload));
+        if (!confirm(`Import "${item.title}" into repository?`)) return;
+        // default: don't auto-download PDFs from external sources unless you want to
+        const res = await fetch(`${EXTERNAL_BASE}/import?downloadPdf=false`, {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(item)
+        });
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error('Import failed: ' + res.status + ' ' + txt);
+        }
+        await res.json();
+        alert('Imported');
+        hideModal();
+        page = 0; query = ''; load(true);
+      } catch (err) {
+        console.error(err);
+        alert('Import error: ' + (err.message || err));
+      }
+    };
+
+    // wire sidebar buttons
+    document.getElementById('repoNav').addEventListener('click', () => { page = 0; query = ''; searchBox.value = ''; load(true); });
+    document.getElementById('uploadNav').addEventListener('click', openUploadModal);
+    document.getElementById('uploadNav').addEventListener('keydown', (e) => { if (e.key === 'Enter') openUploadModal(); });
+    document.getElementById('mySubsNav').addEventListener('click', openMySubmissions);
+    document.getElementById('mySubsNav').addEventListener('keydown', (e) => { if (e.key === 'Enter') openMySubmissions(); });
+    document.getElementById('discoverNav').addEventListener('click', openDiscoverModal);
+    document.getElementById('discoverNav').addEventListener('keydown', (e) => { if (e.key === 'Enter') openDiscoverModal(); });
+
+    // initial load
+    load(true);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,8 @@
+{
+  "title":"Aptitude — Quick Mock",
+  "questions":[
+    {"q":"If 5x + 3 = 23, what is x?","choices":["2","4","5","7"],"answerIndex":2},
+    {"q":"What is 15% of 200?","choices":["15","20","30","25"],"answerIndex":2},
+    {"q":"If a train covers 60 km in 1.5 hours, its speed (km/h) is?","choices":["30","40","50","45"],"answerIndex":1}
+  ]
+}

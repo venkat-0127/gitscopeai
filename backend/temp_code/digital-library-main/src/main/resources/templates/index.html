@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LMS LIMAT</title>
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" th:href="@{index.css}" href="index.css">
+
+  <!-- reCAPTCHA v2 script (you can load async/defer) -->
+  <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoaded&render=explicit" async defer></script>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <header class="header" id="siteHeader" role="navigation" aria-label="Primary">
+    <div class="icon_area">
+      <img src="https://lingayas.edu.in/assets/images/logo.svg" height="44" width="44" alt="Lingayas logo">
+      <div class="icon_name">
+        <h1>E-Platform for Library Resources</h1>
+      </div>
+    </div>
+
+    <nav class="menu" role="menubar" aria-label="Top menu">
+      <button onclick="showHome()" role="menuitem">HOME</button>
+      <button onclick="showPanel('admin')" role="menuitem">ADMIN</button>
+      <button onclick="showPanel('faculty')" role="menuitem">FACULTY</button>
+      <button onclick="showPanel('student')" role="menuitem">STUDENT</button>
+    </nav>
+  </header>
+
+  <!-- MAIN: flexible -->
+  <main class="container" id="mainContainer">
+    <!-- HOME -->
+    <div id="homeContent">
+      <section class="content" role="banner" aria-label="Library hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="hero-overlay" aria-hidden="true"></div>
+
+        <div class="main_content" aria-live="polite">
+          <h1>Welcome To E-Platform of Lingayas Library</h1>
+          <p>Discover, request, and manage library resources quickly — built for students, faculty and admins.
+            <br> Timings: MON–FRI 09:00–15:30, SAT–SUN 10:00–15:00
+          </p>
+        </div>
+      </section>
+
+      <div class="overview" aria-labelledby="overview-title">
+        <div class="side_img_wrap" aria-hidden="false">
+          <div style="position:relative; height:100%;">
+            <div class="img_badge" aria-hidden="true">Library — Visual</div>
+            <div class="side_img_inner">
+              <img class="side_img" src="https://i.pinimg.com/736x/9b/04/e1/9b04e1b66e12a9c4d3144edf73590bb1.jpg"
+                alt="library shelves" loading="lazy">
+            </div>
+          </div>
+        </div>
+
+        <aside class="side_text">
+          <h2 id="overview-title">Overview</h2>
+          <p>A Library Management System (LMS) is an application that streamlines library operations:
+            cataloging, issuing, returning and tracking resources. It helps librarians and users find
+            and manage materials more efficiently.</p>
+
+          <p><strong>Our LMS focuses on:</strong></p>
+          <div class="features" role="list">
+            <div class="feature" role="listitem">OTP-based student &amp; faculty login</div>
+            <div class="feature" role="listitem">Admin-controlled approvals &amp; book management</div>
+            <div class="feature" role="listitem">Year / Semester filtered catalog</div>
+          </div>
+
+          <p style="margin-top:10px;color:var(--muted)">
+            Libraries are evolving hubs — combining physical stacks with digital access to support
+            education, research, and lifelong learning.
+          </p>
+        </aside>
+      </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <section id="adminPanel" class="panel" aria-hidden="true">
+      <h2>Admin Login</h2>
+      <div class="form-row">
+        <input id="adminUser" type="text" placeholder="Username" autocomplete="username">
+        <input id="adminPass" type="password" placeholder="Password" autocomplete="current-password">
+        <button class="btn btn-primary" onclick="adminLogin()">Login</button>
+      </div>
+      <div id="adminErr" class="err" role="alert" style="margin-top:10px;"></div>
+    </section>
+
+    <!-- FACULTY PANEL -->
+    <section id="facultyPanel" class="panel" aria-hidden="true">
+      <h2>Faculty Login (OTP)</h2>
+
+      <div class="form-row">
+        <input id="facultyEmail" type="email" placeholder="name.lingayas@limat.edu.in" autocomplete="email"
+          aria-label="Faculty email">
+        <button id="facultySend" class="btn btn-send" onclick="sendFacultyOtp()">Send OTP</button>
+      </div>
+
+      <div class="form-row" style="margin-top:10px;">
+        <input id="facultyOtp" type="text" placeholder="Enter OTP" inputmode="numeric" aria-label="Faculty OTP">
+        <button id="facultyVerifyBtn" class="btn btn-primary" onclick="verifyFacultyOtp()">Verify</button>
+      </div>
+
+      <!-- reCAPTCHA placeholder for faculty -->
+      <div id="faculty-captcha" style="margin-top:10px;"></div>
+
+      <div id="facultyStatus" class="status" role="status"></div>
+    </section>
+
+    <!-- STUDENT PANEL -->
+    <section id="studentPanel" class="panel" aria-hidden="true">
+      <h2>Student Login (OTP)</h2>
+
+      <div class="form-row">
+        <input id="studentEmail" type="email" placeholder="22na1aXXXX.lingayas@limat.edu.in" autocomplete="email"
+          aria-label="Student email">
+        <button id="studentSend" class="btn btn-send" onclick="sendStudentOtp()">Send OTP</button>
+      </div>
+
+      <div class="form-row" style="margin-top:10px;">
+        <input id="studentOtp" type="text" placeholder="Enter OTP" inputmode="numeric" aria-label="Student OTP">
+        <button id="studentVerifyBtn" class="btn btn-primary" onclick="verifyStudentOtp()">Verify</button>
+      </div>
+
+      <!-- reCAPTCHA placeholder for student -->
+      <div id="student-captcha" style="margin-top:10px;"></div>
+
+      <div id="studentStatus" class="status" role="status"></div>
+    </section>
+
+  </main>
+
+  <!-- SITE FOOTER (contact + copyright only) -->
+  <footer class="site-footer" role="contentinfo" aria-label="Site footer">
+    <div class="footer-inner">
+      <div class="footer-contact" aria-label="Contact information">
+        <div class="fc-item"><strong>Address:</strong> Madalavarigudem, Vijayawada - 521212</div>
+        <div class="fc-item"><strong>Email:</strong> <a
+            href="mailto:college@lingayas.edu.in">college@lingayas.edu.in</a></div>
+        <div class="fc-item"><strong>Phone:</strong> <a href="tel:+919642608888">96426 08888</a></div>
+      </div>
+
+      <div class="footer-copy" aria-hidden="false">
+        &copy; <span id="footer-year"></span> Lingayas Library. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script th:src="@{index.js}" src="index.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,2062 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Career Hub — Career Development</title>
+  <style>
+    :root {
+      --sidebar-bg: #0f1724;
+      --sidebar-accent: #06b6d4;
+      --accent-2: #ff7a59;
+      --main-bg: #f7edd6;
+      --card-bg: #ffffff;
+      --muted: #6b6b6b;
+      --accent-text: #1b1620;
+      --table-head: #fdecea;
+      --action-purple: #6b21a8;
+      --shadow: 0 20px 40px rgba(15, 15, 20, 0.06);
+      --sidebar-width: 280px;
+      --gap: 22px;
+      --breakpoint-sm: 700px;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    [data-theme="dark"] {
+      --sidebar-bg: #071229;
+      --main-bg: #0b1220;
+      --card-bg: #071527;
+      --muted: #bfc9d0;
+      --accent-text: #e6eef0;
+      --table-head: #0e2230;
+      --action-purple: #a78bfa;
+      background: linear-gradient(180deg, #071229, #031018 140%);
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, var(--main-bg), #e9d7b2 120%);
+      color: var(--accent-text);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: fixed;
+      left: 18px;
+      top: 24px;
+      bottom: 24px;
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, var(--sidebar-bg), #071021);
+      border-radius: 14px;
+      padding: 22px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: var(--shadow);
+      overflow: auto;
+    }
+
+    .main-wrapper {
+      margin-left: calc(var(--sidebar-width) + 40px);
+      padding: 24px 28px;
+      max-width: 1200px;
+    }
+
+    .welcome {
+      font-weight: 900;
+      font-size: 20px;
+      color: #cdebdc;
+      line-height: 1.1;
+    }
+
+    .welcome-sub {
+      color: #bfeadc;
+      font-weight: 700;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .nav button {
+      display: block;
+      border-radius: 12px;
+      padding: 12px 14px;
+      border: none;
+      text-align: left;
+      font-weight: 800;
+      background: transparent;
+      color: #e6eef0;
+      cursor: pointer;
+      transition: all .14s ease;
+    }
+
+    .nav button:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .nav button.active {
+      background: linear-gradient(90deg, var(--sidebar-accent), #2dd4bf);
+      color: #062725;
+      box-shadow: 0 12px 28px rgba(6, 182, 212, 0.12);
+    }
+
+    .spacer {
+      flex: 1;
+    }
+
+    .back-btn {
+      margin-top: 6px;
+      background: linear-gradient(90deg, #ffd1b3, var(--accent-2));
+      color: #2b1f1e;
+      border: none;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .main-panel {
+      background: var(--card-bg);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 26px;
+      border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .title {
+      font-size: 34px;
+      margin: 0;
+      font-weight: 900;
+      color: var(--accent-text);
+    }
+
+    .subtitle {
+      margin: 6px 0 0 0;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .top-actions .pill {
+      background: #ffffff;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .top-actions .pill.small {
+      padding: 8px 10px;
+      font-size: 14px;
+    }
+
+    .content-area {
+      margin-top: 18px;
+    }
+
+    .content-card {
+      background: linear-gradient(180deg, #fff, #fff9f2);
+      padding: 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .resource-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .resource-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid #f0e6dc;
+    }
+
+    .res-title {
+      font-weight: 900;
+      font-size: 18px;
+      color: var(--accent-text);
+    }
+
+    .res-meta {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 800;
+      background: transparent;
+      color: var(--accent-text);
+    }
+
+    .btn.primary {
+      background: var(--accent-2);
+      color: #fff;
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      color: var(--accent-text);
+    }
+
+    .btn.small {
+      padding: 6px 8px;
+      font-size: 13px;
+    }
+
+    .btn:focus {
+      outline: 2px solid rgba(6, 182, 212, 0.12);
+    }
+
+    .jobs-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    input.search {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #e6d8c6;
+      width: 360px;
+      min-width: 120px;
+    }
+
+    select.filter {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #e6d8c6;
+    }
+
+    .jobs-table-wrap {
+      border-radius: 14px;
+      overflow: auto;
+      box-shadow: 0 10px 30px rgba(16, 16, 16, 0.04);
+      border: 1px solid rgba(0, 0, 0, 0.03);
+      margin-top: 8px;
+      position: relative;
+      background: #fff;
+    }
+
+    table.jobs-table {
+      width: 100%;
+      min-width: 900px;
+      border-collapse: collapse;
+      background: #fff;
+      table-layout: auto;
+    }
+
+    table.jobs-table thead th {
+      background: var(--table-head);
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 900;
+      color: var(--accent-text);
+      position: relative;
+    }
+
+    table.jobs-table tbody td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      color: var(--muted);
+      font-weight: 700;
+      vertical-align: middle;
+    }
+
+    td.actions-td {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .apply-btn {
+      background: var(--action-purple);
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow: 0 8px 18px rgba(107, 33, 168, 0.12);
+      margin: 0;
+    }
+
+    .title-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .job-title-link {
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-block;
+      font-weight: 900;
+    }
+
+    .job-title-link:hover {
+      text-decoration: underline;
+      color: var(--action-purple);
+    }
+
+    .view-chip {
+      display: none;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 6px 8px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 12px;
+      color: var(--action-purple);
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(107, 33, 168, 0.06);
+    }
+
+    td .title-wrap:hover .view-chip,
+    td .title-wrap:focus-within .view-chip {
+      display: inline-flex;
+    }
+
+    table.jobs-table tbody tr:hover {
+      background: rgba(16, 16, 16, 0.02);
+    }
+
+    .modal-back {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 1600;
+      padding: 18px;
+    }
+
+    .modal {
+      width: min(880px, 96%);
+      background: #fff;
+      padding: 18px;
+      border-radius: 12px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+      max-height: 86vh;
+      overflow: auto;
+    }
+
+    .modal h3 {
+      margin: 0 0 8px;
+    }
+
+    .modal .close {
+      float: right;
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .job-card-list {
+      display: none;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .job-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: #fff;
+    }
+
+    .job-card .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .job-card .meta {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .resume-upload {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .resume-preview {
+      margin-top: 12px;
+      border: 1px dashed rgba(0, 0, 0, 0.06);
+      padding: 12px;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .small-muted {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .progress-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .progress-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      background: #fff;
+    }
+
+    #toast {
+      display: none;
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: rgba(20, 20, 20, 0.9);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      z-index: 3000;
+    }
+
+    .muted-small {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .admin-pill {
+      background: #0b1220;
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .kb {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .list-scroll {
+      max-height: 320px;
+      overflow: auto;
+      padding-right: 6px;
+    }
+
+    .form-row {
+      margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    input[type="email"],
+    textarea,
+    select {
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #e8edf3;
+      width: 100%;
+    }
+
+    table.admin-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table.admin-table th,
+    table.admin-table td {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid #f1f1f1;
+      font-size: 13px;
+    }
+
+    /* ✅ Timer / test question styles */
+    .test-question {
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #eee;
+    }
+
+    .opt-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .opt-btn.selected {
+      background: #eef2ff;
+      border-color: #6366f1;
+    }
+
+    .timer {
+      font-weight: 900;
+      color: #ef4444;
+      margin: 10px 0;
+    }
+
+    /* selection visibility in dark theme */
+    [data-theme="dark"] .opt-btn {
+      color: var(--accent-text);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+
+    [data-theme="dark"] .opt-btn.selected {
+      background: rgba(167, 139, 250, 0.08);
+      box-shadow: none;
+    }
+
+    @media (max-width:1100px) {
+      input.search {
+        width: 220px;
+      }
+
+      .main-wrapper {
+        margin-left: calc(var(--sidebar-width) + 26px);
+        padding: 16px;
+      }
+
+      table.jobs-table {
+        min-width: 800px;
+      }
+    }
+
+    @media (max-width:820px) {
+      .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        border-radius: 12px;
+        left: auto;
+        top: auto;
+        bottom: auto;
+        padding: 12px;
+      }
+
+      .main-wrapper {
+        margin-left: 0;
+        padding: 12px;
+      }
+
+      .nav {
+        flex-direction: row;
+        overflow: auto;
+        gap: 8px;
+      }
+
+      .nav button {
+        white-space: nowrap;
+        min-width: 110px;
+      }
+
+      .jobs-table-wrap {
+        padding-right: 0;
+      }
+    }
+
+    @media (max-width:700px) {
+      table.jobs-table {
+        display: none;
+      }
+
+      .job-card-list {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width:420px) {
+      .modal {
+        padding: 12px;
+      }
+
+      .title {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR (fixed) -->
+  <aside class="sidebar" aria-label="Left Sidebar">
+    <div>
+      <div class="welcome">Welcome to<br>Career Hub</div>
+      <div class="welcome-sub">student portal • opportunities</div>
+    </div>
+
+    <nav class="nav" aria-label="Main navigation">
+      <button id="nav-resume" data-target="resumePanel" class="active">Resume Templates</button>
+      <button id="nav-apt" data-target="aptitudePanel">Aptitude</button>
+      <button id="nav-code" data-target="codingPanel">Coding</button>
+      <button id="nav-interview" data-target="interviewPanel">Interview</button>
+      <button id="nav-jobs" data-target="jobsPanel">Jobs & Internships</button>
+      <button id="nav-bookmarks" data-target="bookmarksPanel">Bookmarks</button>
+    </nav>
+
+    <div class="spacer"></div>
+
+    <button class="back-btn" id="backBtn">← Back</button>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-wrapper">
+    <main class="main-panel" role="main" aria-labelledby="mainTitle">
+      <div class="main-header">
+        <div>
+          <h1 id="mainTitle" class="title">Career Development</h1>
+          <p class="subtitle">Resume • Aptitude • Coding • Interview • Jobs</p>
+        </div>
+
+        <div class="top-actions">
+          <button id="btn-download-apps" class="pill small">Download Saved Applications</button>
+          <button id="btn-toggle-theme" class="pill small">Toggle Dark</button>
+          <button id="btn-export-bookmarks" class="pill small">Export Bookmarks</button>
+          <!-- Admin entry point for Phase 2 -->
+          <button id="btn-open-admin" class="admin-pill" title="Admin (Phase 2)">Admin (Phase 2)</button>
+        </div>
+      </div>
+
+      <div class="content-area">
+
+        <!-- RESUME -->
+        <div id="resumePanel" class="content-card">
+          <h2 style="margin:0 0 8px 0; font-size:20px; font-weight:900;">Resume Templates</h2>
+          <p style="margin:0 0 12px 0; color:var(--muted); font-weight:700;">Download sample templates (demo). You can
+            preview or upload your own resume below.</p>
+
+          <ul class="resource-list" id="resumeList">
+            <li class="resource-item">
+              <div>
+                <div class="res-title">Simple Fresher Resume</div>
+                <div class="res-meta">One-page concise format</div>
+              </div>
+              <div class="item-actions">
+                <button class="btn ghost preview-resume" data-name="Simple Fresher Resume">Preview</button>
+                <button class="btn primary" onclick="downloadDemo('Simple Fresher Resume')">Download</button>
+              </div>
+            </li>
+
+            <li class="resource-item">
+              <div>
+                <div class="res-title">ATS-Friendly Developer CV</div>
+                <div class="res-meta">Optimised for applicant tracking</div>
+              </div>
+              <div class="item-actions">
+                <button class="btn ghost preview-resume" data-name="ATS-Friendly Developer CV">Preview</button>
+                <button class="btn primary" onclick="downloadDemo('ATS-Friendly Developer CV')">Download</button>
+              </div>
+            </li>
+
+            <li class="resource-item">
+              <div>
+                <div class="res-title">Academic / Research CV</div>
+                <div class="res-meta">For PG & research applications</div>
+              </div>
+              <div class="item-actions">
+                <button class="btn ghost preview-resume" data-name="Academic / Research CV">Preview</button>
+                <button class="btn primary" onclick="downloadDemo('Academic CV')">Download</button>
+              </div>
+            </li>
+          </ul>
+
+          <div style="margin-top:14px;">
+            <strong>Upload your resume</strong>
+            <div class="resume-upload">
+              <input id="resumeUploader" type="file" accept=".pdf,.doc,.docx" />
+              <button id="btnRemoveResume" class="btn ghost" style="display:none;">Remove</button>
+              <div id="uploadedName" class="muted-small"></div>
+            </div>
+            <div id="resumePreviewBox" class="resume-preview" style="display:none;"></div>
+          </div>
+        </div>
+
+        <!-- APTITUDE -->
+        <div id="aptitudePanel" class="content-card" style="display:none;">
+          <h2 style="font-size:20px; font-weight:900;">Aptitude Practice</h2>
+          <p style="color:var(--muted); font-weight:700;">Curated mock test links and short practice buckets.</p>
+          <ul style="margin-top:12px; list-style:none; padding:0;">
+            <li style="background:#fff;padding:12px;border-radius:10px;margin-bottom:8px;border:1px solid #f0e6dc;">
+              <strong>Quant & Reasoning</strong> — <a href="https://www.indiabix.com/" target="_blank">Open</a></li>
+            <li style="background:#fff;padding:12px;border-radius:10px;margin-bottom:8px;border:1px solid #f0e6dc;">
+              <strong>Verbal Ability</strong> — <a href="https://www.hackerearth.com/practice/" target="_blank">Open</a>
+            </li>
+          </ul>
+
+          <div style="margin-top:12px;">
+            <strong>Mini progress tracker</strong>
+            <div class="progress-list" id="aptProgress"></div>
+            <button id="aptReset" class="btn ghost" style="margin-top:8px;">Reset Progress</button>
+          </div>
+
+          <div style="margin-top:12px;">
+            <strong>Mock MCQ Tests</strong>
+            <div style="margin-top:10px;">
+              <button class="btn primary" id="start-apt-test">Start Aptitude MCQ</button>
+            </div>
+            <div id="aptResults" style="margin-top:12px;" class="small-muted">No results yet.</div>
+          </div>
+        </div>
+
+        <!-- CODING -->
+        <div id="codingPanel" class="content-card" style="display:none;">
+          <h2 style="font-size:20px; font-weight:900;">Coding Practice</h2>
+          <p style="color:var(--muted); font-weight:700;">Topic-wise resource links and study plan.</p>
+          <ul style="margin-top:12px; list-style:none; padding:0;">
+            <li style="background:#fff;padding:12px;border-radius:10px;margin-bottom:8px;border:1px solid #f0e6dc;">
+              <strong>LeetCode — Top Questions</strong> — <a href="https://leetcode.com/" target="_blank">Open</a></li>
+            <li style="background:#fff;padding:12px;border-radius:10px;margin-bottom:8px;border:1px solid #f0e6dc;">
+              <strong>GFG Practice</strong> — <a href="https://practice.geeksforgeeks.org/" target="_blank">Open</a>
+            </li>
+          </ul>
+
+          <div style="margin-top:12px;">
+            <strong>Mini progress tracker</strong>
+            <div class="progress-list" id="codeProgress"></div>
+            <button id="codeReset" class="btn ghost" style="margin-top:8px;">Reset Progress</button>
+          </div>
+
+          <div style="margin-top:12px;">
+            <strong>Mock MCQ Tests</strong>
+            <div style="margin-top:10px;">
+              <button class="btn primary" id="start-coding-test">Start Coding MCQ</button>
+            </div>
+            <div id="codeResults" style="margin-top:12px;" class="small-muted">No results yet.</div>
+          </div>
+        </div>
+
+        <!-- INTERVIEW -->
+        <div id="interviewPanel" class="content-card" style="display:none;">
+          <h2 style="font-size:20px; font-weight:900;">Interview Prep</h2>
+          <p style="color:var(--muted); font-weight:700;">Mock interview playlists and short tips.</p>
+          <div style="margin-top:12px; display:grid; gap:12px;">
+            <iframe width="100%" height="220" src="https://www.youtube.com/embed/8pTEmbeENF4" title="HR Tips"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            <iframe width="100%" height="220" src="https://www.youtube.com/embed/0Z7B8xO5Ygk" title="Resume Tips"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+          </div>
+        </div>
+
+        <!-- JOBS (unchanged semantics) -->
+        <div id="jobsPanel" class="content-card" style="display:none;">
+          <h2 style="font-size:20px; font-weight:900; margin-bottom:8px;">Available Jobs & Internships</h2>
+
+          <div class="jobs-controls">
+            <input id="jobSearch" class="search" placeholder="Search title, company or location..." />
+            <select id="jobFilter" class="filter">
+              <option value="">All</option>
+              <option value="intern">Intern</option>
+              <option value="permanent">permanent</option>
+              <option value="full-time">Full-time</option>
+              <option value="contract">contract</option>
+            </select>
+
+            <select id="jobSort" class="filter" title="Sort">
+              <option value="newest">Newest</option>
+              <option value="title">Title A→Z</option>
+              <option value="company">Company A→Z</option>
+            </select>
+
+            <button id="btnRefreshJobs" class="btn primary">Refresh</button>
+            <div style="flex:1"></div>
+            <div style="color:var(--muted); font-weight:800;" id="jobsCount">0 posting(s)</div>
+          </div>
+
+          <div class="jobs-table-wrap" id="jobsTableWrapper">
+            <table class="jobs-table" aria-live="polite">
+              <thead>
+                <tr>
+                  <th style="width:30%;">Title</th>
+                  <th style="width:25%;">Company</th>
+                  <th style="width:20%;">Location</th>
+                  <th style="width:10%;">Type</th>
+                  <th style="width:15%;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="jobsTableBody"></tbody>
+            </table>
+            <div style="text-align:center; margin-top:16px;">
+              <button id="loadMoreBtn" class="btn primary">Load More</button>
+            </div>
+
+            <div id="jobCardList" class="job-card-list" aria-hidden="true"></div>
+          </div>
+        </div>
+
+        <!-- BOOKMARKS -->
+        <div id="bookmarksPanel" class="content-card" style="display:none;">
+          <h2 style="font-size:20px; font-weight:900; margin-bottom:8px;">Bookmarked Items</h2>
+          <div id="bookmarksList" style="display:flex; flex-direction:column; gap:10px;"></div>
+          <div style="margin-top:12px;">
+            <button id="btnClearBookmarks" class="btn ghost">Clear All Bookmarks</button>
+          </div>
+        </div>
+
+        <!-- APPLY -->
+        <div id="applyPanel" class="content-card" style="display:none;">
+          <h2 style="font-size:20px; font-weight:900;">Apply for Internship / Job</h2>
+          <p style="color:var(--muted); font-weight:700;">Fill form — demo stores locally and posts to
+            <code>/api/jobs/apply</code> when backend available.</p>
+
+          <form id="applyForm" class="apply-form">
+            <div class="form-row">
+              <div>
+                <label class="small">College Email</label>
+                <input name="email" type="email" required placeholder="you@school.edu" />
+              </div>
+              <div>
+                <label class="small">Position</label>
+                <input name="position" type="text" required placeholder="E.g., Web Dev Intern" />
+              </div>
+            </div>
+
+            <div class="form-row full" style="margin-top:10px;">
+              <div>
+                <label class="small">Resume link (optional)</label>
+                <input name="resume" type="url" placeholder="https://drive.google.com/..." />
+              </div>
+            </div>
+
+            <div class="form-row full" style="margin-top:10px;">
+              <div>
+                <label class="small">Or upload resume (PDF / DOCX)</label>
+                <input id="resumeUpload" name="file" type="file" accept=".pdf,.doc,.docx" />
+              </div>
+            </div>
+
+            <div class="form-row full" style="margin-top:10px;">
+              <div>
+                <label class="small">Short note</label>
+                <textarea name="notes" rows="4" placeholder="Why are you a good fit?"></textarea>
+              </div>
+            </div>
+
+            <div style="margin-top:12px; display:flex; gap:10px; align-items:center;">
+              <button class="btn primary" type="submit">Submit Application</button>
+              <button type="button" class="btn ghost" id="btnClearSavedApps">Clear Saved Apps</button>
+              <div id="applyMsg" class="small" style="color:var(--muted); font-weight:700;"></div>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- JOB DETAIL MODAL -->
+  <div class="modal-back" id="modalBack" role="dialog" aria-modal="true">
+    <div class="modal" role="document">
+      <button class="close" id="modalClose">✕</button>
+      <h3 id="modalTitle">Job details</h3>
+      <div id="modalBody" style="margin-top:8px; color:var(--muted); font-weight:700;"></div>
+      <div style="margin-top:12px; display:flex; gap:10px; justify-content:flex-end;">
+        <button id="modalBookmark" class="btn ghost">Bookmark</button>
+        <a id="modalApplyLink" class="apply-btn" href="#" target="_blank" rel="noopener">Open on Source</a>
+        <button id="modalQuickApply" class="btn primary" style="display:inline-block;">Quick Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN AUTH & PANEL (unchanged) -->
+  <div class="modal-back" id="adminAuthBack" role="dialog" aria-modal="true">
+    <div class="modal" role="document">
+      <button class="close" id="adminAuthClose">✕</button>
+      <h3>Admin Access — Phase 2</h3>
+      <p class="kb">Enter admin passphrase to open the Admin panel (client-only demo). Default: <code>admin123</code>
+      </p>
+      <div style="margin-top:12px;">
+        <input id="adminPass" placeholder="Enter admin passphrase" />
+        <div style="margin-top:12px; display:flex; gap:8px; justify-content:flex-end;">
+          <button id="adminAuthSubmit" class="btn primary">Open Admin</button>
+          <button id="adminAuthCancel" class="btn ghost">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-back" id="adminPanelBack" role="dialog" aria-modal="true">
+    <div class="modal" role="document" style="width:min(1000px,96%)">
+      <button class="close" id="adminPanelClose">✕</button>
+      <h3>Admin Panel — Phase 2 (Client-only)</h3>
+
+      <div style="margin-top:12px;" class="admin-grid">
+        <div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <strong>Jobs (create / edit)</strong>
+            <div class="kb">Add, edit or delete job postings. Changes saved to localStorage.</div>
+          </div>
+
+          <div style="margin-top:8px; border:1px solid #f1f1f1; padding:12px; border-radius:8px;">
+            <div class="form-row"><label class="small">Title</label><input id="admin_job_title" type="text" /></div>
+            <div class="form-row"><label class="small">Company</label><input id="admin_job_company" type="text" /></div>
+            <div class="form-row"><label class="small">Location</label><input id="admin_job_location" type="text" />
+            </div>
+            <div class="form-row"><label class="small">Type</label><input id="admin_job_type" type="text"
+                placeholder="Intern / permanent / contract" /></div>
+            <div class="form-row"><label class="small">Apply URL</label><input id="admin_job_apply" type="url" /></div>
+            <div class="form-row"><label class="small">Description</label><textarea id="admin_job_desc"
+                rows="4"></textarea></div>
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+              <button id="admin_add_job" class="btn primary">Add Job</button>
+              <button id="admin_update_job" class="btn ghost" style="display:none;">Update Job</button>
+              <button id="admin_clear_job" class="btn ghost">Clear</button>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <strong>Existing jobs</strong>
+            <div class="list-scroll" id="admin_jobs_list" style="margin-top:8px;"></div>
+          </div>
+        </div>
+
+        <div>
+          <div style="display:flex; gap:8px; align-items:center; justify-content:space-between;">
+            <div>
+              <strong>Tests (create / edit)</strong>
+              <div class="kb">Create MCQ tests that appear for students.</div>
+            </div>
+
+            <div>
+              <button id="admin_export_all" class="btn ghost">Export (jobs/tests/apps/bookmarks)</button>
+              <button id="admin_import_all" class="btn primary">Import JSON</button>
+              <input id="adminImportFile" type="file" accept=".json" style="display:none" />
+            </div>
+          </div>
+
+          <div style="margin-top:10px; border:1px solid #f1f1f1; padding:12px; border-radius:8px;">
+            <div class="form-row"><label class="small">Test title</label><input id="admin_test_title" type="text" />
+            </div>
+            <div class="form-row"><label class="small">Questions (JSON)</label>
+              <textarea id="admin_test_questions" rows="8"
+                placeholder='Example: [{"q":"Question?","choices":["a","b","c"],"answerIndex":0}]'></textarea>
+            </div>
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+              <button id="admin_add_test" class="btn primary">Add Test</button>
+              <button id="admin_update_test" class="btn ghost" style="display:none;">Update Test</button>
+              <button id="admin_clear_test" class="btn ghost">Clear</button>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <strong>Existing tests</strong>
+            <div class="list-scroll" id="admin_tests_list" style="margin-top:8px;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STUDENT TEST OVERLAY (server-backable modal) -->
+  <div id="testOverlay"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:5000; align-items:center; justify-content:center;">
+    <div
+      style="background:#fff; padding:20px; border-radius:12px; width:min(900px,95%); max-height:90vh; overflow:auto;">
+      <button id="testClose" style="float:right;background:none;border:none;font-size:18px;cursor:pointer;">✕</button>
+      <h3 id="testTitle"></h3>
+      <div id="testTimer" class="timer"></div>
+      <div id="testQuestions"></div>
+      <div style="margin-top:16px; text-align:right;">
+        <button id="testCancel" class="btn ghost">Cancel</button>
+        <button id="testSubmit" class="btn primary">Submit</button>
+      </div>
+    </div>
+  </div>
+  <div id="toast"></div>
+
+  <script>
+    (async function () {
+      /* CONFIG */
+      // Put your Aduzona / backend job endpoint here. Example:
+      // ADUZONA_JOBS_API = 'https://your-backend.example.com/api/jobs' OR your Adzuna proxy endpoint
+      const ADUZONA_JOBS_API = '/api/jobs';
+      const SERVER_TESTS_API = '/api/tests';
+      const SERVER_TEST_SUBMIT_PREFIX = '/api/tests';
+
+      /* STORAGE KEYS */
+      const JOBS_KEY = 'cd_jobs_v2';
+      const APPS_KEY = 'cd_apps_v2';
+      const BOOKMARKS_KEY = 'cd_bookmarks_v2';
+      const RESUME_UPLOAD_KEY = 'cd_resume_upload';
+      const PROGRESS_KEY = 'cd_progress_v1';
+      const THEME_KEY = 'cd_theme_v1';
+      const TESTS_KEY = 'cd_tests_v1';
+      const TEST_RESULTS_KEY = 'cd_test_results_v1';
+
+      /* HELPERS */
+      function lsGet(k, fallback) { try { return JSON.parse(localStorage.getItem(k) || JSON.stringify(fallback)); } catch (e) { return fallback; } }
+      function lsSet(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+      function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
+      function escapeAttr(s) { return String(s || '').replace(/"/g, '&quot;').replace(/'/g, ''); }
+      function showToast(msg, ms = 1600) { const t = document.getElementById('toast'); if (!t) return; t.textContent = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', ms); }
+
+      /* small debounce */
+      function debounce(fn, wait = 250) {
+        let t;
+        return (...args) => { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), wait); };
+      }
+
+      /* DOM refs */
+      const jobsTableBody = document.getElementById('jobsTableBody');
+      const jobCardList = document.getElementById('jobCardList');
+      const jobSearch = document.getElementById('jobSearch');
+      const jobFilter = document.getElementById('jobFilter');
+      const jobSort = document.getElementById('jobSort');
+      const jobsCount = document.getElementById('jobsCount');
+
+      const overlay = document.getElementById('testOverlay');
+      const overlayTitle = document.getElementById('testTitle');
+      const overlayQRoot = document.getElementById('testQuestions');
+      const testTimerEl = document.getElementById('testTimer');
+      const overlaySubmit = document.getElementById('testSubmit');
+      const overlayClose = document.getElementById('testClose');
+      const overlayCancel = document.getElementById('testCancel');
+
+      /* Ensure local test seeds exist */
+      function ensureDefaults() {
+        const defaultTests = lsGet(TESTS_KEY, null) || [
+          {
+            id: 't1',
+            title: 'Aptitude — Basic',
+            questions: [
+              { q: 'If 5x + 3 = 23, what is x?', choices: ['2', '4', '5', '7'], answerIndex: 2 },
+              { q: 'What is 15% of 200?', choices: ['15', '20', '30', '25'], answerIndex: 2 },
+              { q: 'If a train covers 60 km in 1.5 hours, its speed (km/h) is?', choices: ['30', '40', '50', '45'], answerIndex: 1 }
+            ]
+          },
+          {
+            id: 't2',
+            title: 'Coding — Basics (MCQ)',
+            questions: [
+              { q: 'Which data structure uses LIFO?', choices: ['Queue', 'Stack', 'Tree', 'Graph'], answerIndex: 1 },
+              { q: 'Which language is primarily used for web styling?', choices: ['JavaScript', 'HTML', 'CSS', 'Python'], answerIndex: 2 },
+              { q: 'What does SQL stand for?', choices: ['Structured Query Language', 'Simple Query Language', 'Server Query Language', 'None'], answerIndex: 0 }
+            ]
+          }
+        ];
+        if (!lsGet(TESTS_KEY, null)) lsSet(TESTS_KEY, defaultTests);
+        if (!lsGet(TEST_RESULTS_KEY, null)) lsSet(TEST_RESULTS_KEY, []);
+      }
+      ensureDefaults();
+
+      /* JOBS local storage helpers */
+      function getLocalJobs() { return lsGet(JOBS_KEY, []); }
+      function setLocalJobs(arr) { lsSet(JOBS_KEY, arr); }
+
+      function sortList(list, mode) {
+        if (mode === 'title') return list.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+        if (mode === 'company') return list.sort((a, b) => (a.company || '').localeCompare(b.company || ''));
+        if (mode === 'newest') return list.sort((a, b) => (b.postedDate || '').localeCompare(a.postedDate || ''));
+        return list;
+      }
+
+      function renderJobs() {
+        if (!jobsTableBody) return;
+        const q = (jobSearch?.value || '').toLowerCase().trim();
+        const f = (jobFilter?.value || '').toLowerCase().trim();
+        const sortMode = (jobSort?.value) || 'newest';
+        let list = getLocalJobs().filter(job => {
+          const hay = (((job.title || '') + ' ' + (job.company || '') + ' ' + (job.location || '') + ' ' + (job.jobType || '')).toLowerCase());
+          const matchQ = !q || hay.includes(q);
+          let matchF = true;
+          if (f) {
+            // make filter tolerant: allow contains and synonyms
+            const jt = String(job.jobType || '').toLowerCase();
+            matchF = jt.includes(f) || hay.includes(f);
+          }
+          return matchQ && matchF;
+        });
+        list = sortList(list, sortMode);
+
+        jobsTableBody.innerHTML = '';
+        if (!list.length) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td colspan="5" style="text-align:center;padding:20px;color:var(--muted);font-weight:700">No jobs found. Try refresh or add jobs from Admin.</td>`;
+          jobsTableBody.appendChild(tr);
+          if (jobCardList) jobCardList.innerHTML = '';
+          if (jobsCount) jobsCount.textContent = `0 posting(s)`;
+          return;
+        }
+
+        list.forEach(job => {
+          const tr = document.createElement('tr');
+          const titleContent = `<span class="title-wrap">
+                              <a class="job-title-link" data-job-id="${escapeAttr(job.id)}">${escapeHtml(job.title)}</a>
+                              <button class="view-chip" data-job-id="${escapeAttr(job.id)}">View</button>
+                            </span>`;
+          tr.innerHTML = `
+        <td style="font-weight:900; color:var(--accent-text)">${titleContent}</td>
+        <td>${escapeHtml(job.company)}</td>
+        <td>${escapeHtml(job.location)}</td>
+        <td>${escapeHtml(job.jobType)}</td>
+        <td class="actions-td">
+          <a class="apply-btn" href="${escapeAttr(job.applyUrl || '#')}" target="_blank" rel="noopener">Apply</a>
+        </td>`;
+          jobsTableBody.appendChild(tr);
+        });
+
+        // interactions
+        document.querySelectorAll('.job-title-link, .view-chip').forEach(el => {
+          el.addEventListener('click', (e) => {
+            const id = e.currentTarget.dataset.jobId;
+            openJobModal(id);
+          });
+        });
+
+        // card list for small screens
+        if (jobCardList) {
+          jobCardList.innerHTML = '';
+          list.forEach(job => {
+            const card = document.createElement('div');
+            card.className = 'job-card';
+            card.innerHTML = `
+          <div class="row">
+            <div>
+              <div style="font-weight:900; font-size:16px;"><a class="job-title-link" data-job-id="${escapeAttr(job.id)}">${escapeHtml(job.title)}</a></div>
+              <div class="meta">${escapeHtml(job.company)} • ${escapeHtml(job.location)} • ${escapeHtml(job.jobType)}</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+              <a class="apply-btn" href="${escapeAttr(job.applyUrl || '#')}" target="_blank" rel="noopener">Apply</a>
+            </div>
+          </div>
+          <div style="color:var(--muted); font-weight:700; margin-top:6px;">Posted: ${escapeHtml(job.postedDate || '')}</div>
+        `;
+            jobCardList.appendChild(card);
+          });
+          jobCardList.querySelectorAll('.job-title-link').forEach(el => {
+            el.addEventListener('click', (e) => { const id = e.currentTarget.dataset.jobId; openJobModal(id); });
+          });
+        }
+
+        if (jobsCount) jobsCount.textContent = `${list.length} posting(s)`;
+      }
+
+      function openJobModal(id) {
+        const job = getLocalJobs().find(j => String(j.id) === String(id));
+        if (!job) return;
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        modalTitle.textContent = `${job.title} — ${job.company}`;
+        const posted = job.postedDate ? `<div><strong>Posted:</strong> ${escapeHtml(job.postedDate)}</div>` : '';
+        modalBody.innerHTML = `${posted}
+      <div style="margin-top:8px;"><strong>Location:</strong> ${escapeHtml(job.location)}</div>
+      <div style="margin-top:10px; white-space:pre-wrap; color:var(--muted); font-weight:700;">${escapeHtml(job.description || 'No description provided.')}</div>`;
+        document.getElementById('modalApplyLink').href = job.applyUrl || '#';
+        document.getElementById('modalBack').style.display = 'flex';
+        document.getElementById('modalBookmark').dataset.jobId = job.id;
+        document.getElementById('modalQuickApply').dataset.jobId = job.id;
+      }
+
+      // modal close handlers
+      document.getElementById('modalClose')?.addEventListener('click', () => document.getElementById('modalBack').style.display = 'none');
+      document.getElementById('modalBack')?.addEventListener('click', (e) => { if (e.target.id === 'modalBack') e.target.style.display = 'none'; });
+
+      /* Bookmarks */
+      function renderBookmarks() {
+        const arr = lsGet(BOOKMARKS_KEY, []);
+        const bookmarksListEl = document.getElementById('bookmarksList');
+        if (!bookmarksListEl) return;
+        bookmarksListEl.innerHTML = '';
+        if (!arr.length) { bookmarksListEl.innerHTML = '<div class="small-muted">No bookmarks yet.</div>'; return; }
+        arr.forEach(item => {
+          const d = document.createElement('div');
+          d.style.display = 'flex'; d.style.justifyContent = 'space-between'; d.style.alignItems = 'center'; d.style.gap = '12px';
+          d.style.padding = '10px'; d.style.border = '1px solid rgba(0,0,0,0.04)'; d.style.borderRadius = '8px'; d.style.background = '#fff';
+          d.innerHTML = `<div style="font-weight:900">${escapeHtml(item.title)}<div class="muted-small" style="font-weight:700">${escapeHtml(item.company || '')}</div></div>
+                     <div style="display:flex;gap:8px">
+                       <button class="btn ghost open-bookmark" data-id="${escapeAttr(item.id)}">Open</button>
+                       <button class="btn primary remove-bookmark" data-id="${escapeAttr(item.id)}">Remove</button>
+                     </div>`;
+          bookmarksListEl.appendChild(d);
+        });
+        bookmarksListEl.querySelectorAll('.open-bookmark').forEach(b => b.addEventListener('click', e => {
+          const id = e.currentTarget.dataset.id; openJobModal(id); showPanel('jobs');
+        }));
+        bookmarksListEl.querySelectorAll('.remove-bookmark').forEach(b => b.addEventListener('click', e => {
+          const id = e.currentTarget.dataset.id;
+          const arr = lsGet(BOOKMARKS_KEY, []).filter(x => String(x.id) !== String(id));
+          lsSet(BOOKMARKS_KEY, arr);
+          renderBookmarks();
+          showToast('Bookmark removed');
+        }));
+      }
+
+      document.getElementById('btnClearBookmarks')?.addEventListener('click', () => {
+        if (!confirm('Clear all bookmarks?')) return;
+        localStorage.removeItem(BOOKMARKS_KEY);
+        renderBookmarks();
+        showToast('Bookmarks cleared');
+      });
+
+      document.getElementById('modalBookmark')?.addEventListener('click', () => {
+        const id = document.getElementById('modalBookmark').dataset.jobId;
+        if (!id) return;
+        const jobs = getLocalJobs();
+        const j = jobs.find(x => String(x.id) === String(id));
+        if (!j) return;
+        const arr = lsGet(BOOKMARKS_KEY, []);
+        if (!arr.some(x => String(x.id) === String(id))) {
+          arr.unshift({ id: j.id, title: j.title, company: j.company, applyUrl: j.applyUrl });
+          lsSet(BOOKMARKS_KEY, arr);
+          renderBookmarks();
+          showToast('Bookmarked');
+        } else showToast('Already bookmarked');
+      });
+
+      document.getElementById('btn-export-bookmarks')?.addEventListener('click', () => {
+        const arr = lsGet(BOOKMARKS_KEY, []);
+        if (!arr.length) { alert('No bookmarks to export'); return; }
+        const blob = new Blob([JSON.stringify(arr, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'bookmarks.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+        showToast('Bookmarks exported');
+      });
+
+      /* Theme toggle */
+      const themeBtn = document.getElementById('btn-toggle-theme');
+      function applyStoredTheme() {
+        const theme = localStorage.getItem(THEME_KEY) || 'light';
+        if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        else document.documentElement.removeAttribute('data-theme');
+      }
+      applyStoredTheme();
+      themeBtn?.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+        const next = current === 'dark' ? 'light' : 'dark';
+        if (next === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        else document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem(THEME_KEY, next);
+        showToast(`Theme: ${next}`);
+      });
+
+      /* Resume upload */
+      const resumeUploader = document.getElementById('resumeUploader');
+      const uploadedName = document.getElementById('uploadedName');
+      const resumePreviewBox = document.getElementById('resumePreviewBox');
+      const btnRemoveResume = document.getElementById('btnRemoveResume');
+
+      function loadUploadedResume() {
+        const saved = lsGet(RESUME_UPLOAD_KEY, null);
+        if (!saved) { if (uploadedName) uploadedName.textContent = ''; if (resumePreviewBox) resumePreviewBox.style.display = 'none'; if (btnRemoveResume) btnRemoveResume.style.display = 'none'; return; }
+        if (uploadedName) uploadedName.textContent = `Saved: ${saved.name}`;
+        if (resumePreviewBox) { resumePreviewBox.style.display = 'block'; resumePreviewBox.innerHTML = `<div style="font-weight:900">${escapeHtml(saved.name)}</div><div class="small-muted" style="margin-top:6px">Uploaded on ${new Date(saved.created).toLocaleString()}</div>`; }
+        if (btnRemoveResume) btnRemoveResume.style.display = 'inline-block';
+      }
+      resumeUploader?.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+          const payload = { name: f.name, data: evt.target.result, created: new Date().toISOString() };
+          lsSet(RESUME_UPLOAD_KEY, payload);
+          loadUploadedResume();
+          showToast('Resume uploaded & saved locally');
+        };
+        reader.readAsDataURL(f);
+      });
+      btnRemoveResume?.addEventListener('click', () => {
+        localStorage.removeItem(RESUME_UPLOAD_KEY);
+        loadUploadedResume();
+        showToast('Uploaded resume removed');
+      });
+      document.querySelectorAll('.preview-resume').forEach(btn => btn.addEventListener('click', () => alert('Preview placeholder (no server preview available).')));
+
+      /* Apply form */
+      const applyForm = document.getElementById('applyForm');
+      const resumeUpload = document.getElementById('resumeUpload');
+      const applyMsg = document.getElementById('applyMsg');
+
+      applyForm?.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const fd = new FormData(applyForm);
+        const payload = {
+          id: String(Date.now()).slice(-6),
+          email: fd.get('email'),
+          position: fd.get('position'),
+          resumeLink: fd.get('resume'),
+          notes: fd.get('notes'),
+          created: new Date().toISOString()
+        };
+        const file = resumeUpload?.files?.[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (evt) {
+            payload.uploadedFileName = file.name;
+            payload.uploadedFileData = evt.target.result;
+            submitPayload(payload);
+          };
+          reader.readAsDataURL(file);
+        } else submitPayload(payload);
+      });
+
+      async function submitPayload(payload) {
+        try {
+          const res = await fetch('/api/jobs/apply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+          if (!res.ok) throw new Error('backend ' + res.status);
+          const j = await res.json().catch(() => ({ message: 'Application submitted' }));
+          if (applyMsg) applyMsg.textContent = j.message || 'Application submitted';
+          applyForm.reset();
+          setTimeout(() => applyMsg.textContent = '', 3000);
+        } catch (err) {
+          const arr = lsGet(APPS_KEY, []);
+          arr.unshift(payload);
+          lsSet(APPS_KEY, arr);
+          if (applyMsg) applyMsg.textContent = 'Saved locally (no backend)';
+          applyForm.reset();
+          setTimeout(() => applyMsg.textContent = '', 2800);
+        }
+      }
+
+      document.getElementById('btnClearSavedApps')?.addEventListener('click', () => {
+        if (!confirm('Clear saved applications?')) return;
+        localStorage.removeItem(APPS_KEY);
+        showToast('Saved applications cleared');
+      });
+
+      document.getElementById('btn-download-apps')?.addEventListener('click', () => {
+        const arr = lsGet(APPS_KEY, []);
+        if (!arr || !arr.length) { alert('No saved applications'); return; }
+        const blob = new Blob([JSON.stringify(arr, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'saved_applications.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      });
+
+      /* Admin wiring (open/auth) */
+      const openAdminBtn = document.getElementById('btn-open-admin');
+      const adminAuthBack = document.getElementById('adminAuthBack');
+      const adminPanelBack = document.getElementById('adminPanelBack');
+
+      openAdminBtn?.addEventListener('click', () => {
+        document.getElementById('adminPass').value = '';
+        if (adminAuthBack) adminAuthBack.style.display = 'flex';
+      });
+      document.getElementById('adminAuthClose')?.addEventListener('click', () => adminAuthBack.style.display = 'none');
+      document.getElementById('adminAuthCancel')?.addEventListener('click', () => adminAuthBack.style.display = 'none');
+
+      document.getElementById('adminAuthSubmit')?.addEventListener('click', () => {
+        const pass = document.getElementById('adminPass').value.trim();
+        if (pass === 'admin123') {
+          adminAuthBack.style.display = 'none';
+          adminPanelBack.style.display = 'flex';
+          loadAdminDataLists();
+        } else {
+          alert('Incorrect passphrase (client-only).');
+        }
+      });
+      document.getElementById('adminPanelClose')?.addEventListener('click', () => adminPanelBack.style.display = 'none');
+
+      /* --- TESTS (single consistent implementation) --- */
+      let currentOverlayTest = null;
+      let currentOverlayAnswers = [];
+      let currentQuestionIndex = 0;
+      let perQuestionSeconds = 60;
+      let questionTimer = null;
+      let remainingSeconds = perQuestionSeconds;
+
+      function clearQuestionTimer() {
+        if (questionTimer) { clearInterval(questionTimer); questionTimer = null; }
+      }
+      function startQuestionTimer() {
+        clearQuestionTimer();
+        remainingSeconds = perQuestionSeconds;
+        updateTimerUI();
+        questionTimer = setInterval(() => {
+          remainingSeconds--;
+          updateTimerUI();
+          if (remainingSeconds <= 0) handleTimeUpForQuestion();
+        }, 1000);
+      }
+      function updateTimerUI() {
+        if (!testTimerEl) return;
+        testTimerEl.textContent = `${remainingSeconds}s`;
+        if (remainingSeconds <= 10) {
+          testTimerEl.style.background = 'rgba(239,68,68,0.08)';
+          testTimerEl.style.color = 'var(--danger)';
+        } else {
+          testTimerEl.style.background = 'rgba(0,0,0,0.04)';
+          testTimerEl.style.color = 'inherit';
+        }
+      }
+      function handleTimeUpForQuestion() {
+        clearQuestionTimer();
+        const optsContainer = document.querySelector(`#opts-${currentQuestionIndex}`);
+        if (optsContainer) Array.from(optsContainer.children).forEach(ch => ch.classList.add('disabled'));
+        setTimeout(() => {
+          if (currentOverlayTest && currentQuestionIndex < currentOverlayTest.questions.length - 1) {
+            goToQuestion(currentQuestionIndex + 1);
+          } else {
+            submitCurrentTest();
+          }
+        }, 700);
+      }
+
+      function openTestOverlay(test) {
+        currentOverlayTest = test;
+        currentOverlayAnswers = Array(test.questions.length).fill(null);
+        currentQuestionIndex = 0;
+        overlayTitle.textContent = test.title || 'Test';
+        overlayQRoot.innerHTML = '';
+        test.questions.forEach((qq, idx) => {
+          const div = document.createElement('div');
+          div.className = 'test-question';
+          const questionHtml = `<div style="font-weight:900">${idx + 1}. ${escapeHtml(qq.q)}</div><div style="margin-top:8px; display:flex;flex-wrap:wrap;gap:8px" id="opts-${idx}"></div>`;
+          div.innerHTML = questionHtml;
+          overlayQRoot.appendChild(div);
+          const opts = div.querySelector(`#opts-${idx}`);
+          qq.choices.forEach((c, ci) => {
+            const b = document.createElement('button');
+            b.className = 'opt-btn';
+            b.textContent = c;
+            b.setAttribute('data-q', idx);
+            b.setAttribute('data-choice', ci);
+            b.addEventListener('click', () => {
+              if (b.classList.contains('disabled')) return;
+              currentOverlayAnswers[idx] = ci;
+              Array.from(opts.children).forEach(ch => ch.classList.remove('selected'));
+              b.classList.add('selected');
+              Array.from(opts.children).forEach(ch => ch.classList.add('disabled'));
+              setTimeout(() => {
+                if (idx < test.questions.length - 1) goToQuestion(idx + 1);
+              }, 350);
+            });
+            opts.appendChild(b);
+          });
+        });
+
+        showQuestion(currentQuestionIndex);
+        overlay.style.display = 'flex';
+        overlaySubmit.style.display = '';
+        startQuestionTimer();
+        updateProgressLabel();
+      }
+
+      function showQuestion(index) {
+        const container = document.getElementById('opts-' + index);
+        if (!container) return;
+        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const chosen = currentOverlayAnswers[index];
+        const opts = Array.from(container.children);
+        opts.forEach(ch => {
+          ch.classList.remove('selected');
+          ch.classList.remove('disabled');
+          const ci = Number(ch.getAttribute('data-choice'));
+          if (chosen !== null && chosen === ci) {
+            ch.classList.add('selected');
+            ch.classList.add('disabled');
+          }
+        });
+        startQuestionTimer();
+        updateProgressLabel();
+      }
+
+      function goToQuestion(index) {
+        if (!currentOverlayTest) return;
+        if (index < 0 || index >= currentOverlayTest.questions.length) return;
+        clearQuestionTimer();
+        currentQuestionIndex = index;
+        showQuestion(index);
+      }
+
+      overlayClose?.addEventListener('click', () => { overlay.style.display = 'none'; clearQuestionTimer(); });
+      overlayCancel?.addEventListener('click', () => { overlay.style.display = 'none'; clearQuestionTimer(); });
+      overlay?.addEventListener('click', (e) => { if (e.target === overlay) { overlay.style.display = 'none'; clearQuestionTimer(); } });
+
+      function localGradeAndStore(test, answers) {
+        let correct = 0;
+        const feedback = [];
+        test.questions.forEach((qq, idx) => {
+          const sel = answers[idx];
+          const ok = sel === qq.answerIndex;
+          if (ok) correct++;
+          feedback.push({ q: qq.q, selected: sel, correct: qq.answerIndex, choices: qq.choices });
+        });
+        const score = Math.round((correct / test.questions.length) * 100);
+        const now = new Date().toISOString();
+        const testResult = { id: test.id, title: test.title, score, correct, total: test.questions.length, timestamp: now, feedback };
+        const results = lsGet(TEST_RESULTS_KEY, []);
+        results.unshift(testResult);
+        lsSet(TEST_RESULTS_KEY, results);
+        return testResult;
+      }
+
+      async function submitCurrentTest() {
+        if (!currentOverlayTest) return;
+        overlaySubmit.disabled = true;
+        clearQuestionTimer();
+        const isServerCandidate = typeof currentOverlayTest.id === 'number' || /^[0-9]+$/.test(String(currentOverlayTest.id));
+        if (isServerCandidate) {
+          try {
+            const res = await fetch(`${SERVER_TEST_SUBMIT_PREFIX}/${currentOverlayTest.id}/submit`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: 'guest', answers: currentOverlayAnswers })
+            });
+            if (!res.ok) throw new Error('Server submission failed');
+            const body = await res.json();
+            overlayQRoot.innerHTML = `<h3>Score: ${body.score}% (${body.correct}/${body.total})</h3>
+          <div style="margin-top:8px">${(body.feedback || []).map((f, i) => `<div style="padding:8px;border-top:1px solid #f1f5f9"><strong>${i + 1}. ${escapeHtml(f.q)}</strong><div class="small-muted">Your: ${f.selected === null ? '<em>no answer</em>' : escapeHtml(String(f.selected))} • Correct: ${escapeHtml(String(f.correct))}</div></div>`).join('')}</div>`;
+            overlaySubmit.style.display = 'none';
+            return;
+          } catch (err) {
+            console.warn('Server submit failed, using local grading', err);
+          }
+        }
+        const result = localGradeAndStore(currentOverlayTest, currentOverlayAnswers);
+        overlayQRoot.innerHTML = `<h3>Score: ${result.score}% (${result.correct}/${result.total})</h3><div style="margin-top:8px">${result.feedback.map((f, idx) => `<div style="padding:8px;border-top:1px solid #f1f5f9"><strong>${idx + 1}. ${escapeHtml(f.q)}</strong><div class="small-muted">Your: ${f.selected === null ? '<em>no answer</em>' : escapeHtml(f.choices[f.selected])} • Correct: ${escapeHtml(f.choices[f.correct])}</div></div>`).join('')}</div>`;
+        overlaySubmit.style.display = 'none';
+        renderTestResultsSummary();
+        showToast('Test saved locally');
+      }
+
+      overlaySubmit?.addEventListener('click', submitCurrentTest);
+
+      /* fetch server tests (optional) */
+      async function fetchServerTests() {
+        try {
+          const r = await fetch(SERVER_TESTS_API);
+          if (!r.ok) throw new Error('no server tests');
+          return await r.json();
+        } catch (e) {
+          return null;
+        }
+      }
+
+      /* startTestPreferServer: STRICT matching to avoid wrong fallback */
+      async function startTestPreferServer(matchFn) {
+        // Try server tests first
+        const serverTests = await fetchServerTests();
+        if (serverTests && serverTests.length) {
+          const foundServer = serverTests.find(matchFn);
+          if (foundServer) return openTestOverlay(foundServer);
+        }
+        // fallback: local tests - but choose a matching local test only
+        const local = lsGet(TESTS_KEY, []);
+        const foundLocal = local.find(matchFn);
+        if (foundLocal) return openTestOverlay(foundLocal);
+        // nothing matched
+        alert('No matching test available.');
+      }
+
+      /* BUTTONS: use stricter matchers so coding won't accidentally pick aptitude */
+      document.getElementById('start-apt-test')?.addEventListener('click', () => {
+        startTestPreferServer(t => {
+          const title = (t.title || '').toLowerCase();
+          return title.includes('apt') || title.includes('aptitude') || String(t.id) === 't1';
+        });
+      });
+
+      document.getElementById('start-coding-test')?.addEventListener('click', () => {
+        startTestPreferServer(t => {
+          const title = (t.title || '').toLowerCase();
+          return title.includes('code') || title.includes('coding') || String(t.id) === 't2';
+        });
+      });
+
+      /* Test results summary */
+      function renderTestResultsSummary() {
+        const results = lsGet(TEST_RESULTS_KEY, []);
+        const aptResults = results.filter(r => r.id === 't1' || (r.title || '').toLowerCase().includes('apt'));
+        const codeResults = results.filter(r => r.id === 't2' || (r.title || '').toLowerCase().includes('code'));
+        document.getElementById('aptResults') && (document.getElementById('aptResults').textContent = aptResults.length ? `${aptResults[0].title}: ${aptResults[0].score}% (${aptResults[0].correct}/${aptResults[0].total})` : 'No results yet.');
+        document.getElementById('codeResults') && (document.getElementById('codeResults').textContent = codeResults.length ? `${codeResults[0].title}: ${codeResults[0].score}% (${codeResults[0].correct}/${codeResults[0].total})` : 'No results yet.');
+      }
+
+      function updateProgressLabel() {
+        if (!currentOverlayTest) return;
+        // no explicit element in this layout, kept safe
+      }
+
+      /* Panel switching */
+      const navButtons = document.querySelectorAll('.nav button');
+      const panels = {
+        resume: document.getElementById('resumePanel'),
+        aptitude: document.getElementById('aptitudePanel'),
+        coding: document.getElementById('codingPanel'),
+        interview: document.getElementById('interviewPanel'),
+        jobs: document.getElementById('jobsPanel'),
+        apply: document.getElementById('applyPanel'),
+        bookmarks: document.getElementById('bookmarksPanel')
+      };
+      function showPanel(key) {
+        Object.values(panels).forEach(p => { if (p) p.style.display = 'none'; });
+        if (panels[key]) panels[key].style.display = '';
+        navButtons.forEach(b => b.classList.toggle('active', b.dataset.target === (key + 'Panel')));
+      }
+      navButtons.forEach(btn => btn.addEventListener('click', () => {
+        const t = btn.dataset.target;
+        if (t === 'resumePanel') showPanel('resume');
+        if (t === 'aptitudePanel') showPanel('aptitude');
+        if (t === 'codingPanel') showPanel('coding');
+        if (t === 'interviewPanel') showPanel('interview');
+        if (t === 'jobsPanel') showPanel('jobs');
+        if (t === 'bookmarksPanel') showPanel('bookmarks');
+      }));
+      document.getElementById('backBtn')?.addEventListener('click', () => { try { window.location.href = '/tiles'; } catch (e) { } });
+
+      /* Fetch jobs from server, normalize/store locally.
+         IMPORTANT: do NOT erase local cache on server error. Keep local jobs available. */
+      async function fetchJobsFromServer() {
+        try {
+          const r = await fetch('/api/jobs');
+          if (!r.ok) throw new Error('Job API returned ' + r.status);
+          const body = await r.json();
+
+          // ✅ Normalize Spring Page<> response or plain array
+          let jobs = [];
+          if (Array.isArray(body)) {
+            jobs = body;
+          } else if (Array.isArray(body.content)) {
+            jobs = body.content;
+          } else {
+            console.warn('Unknown response shape', body);
+            jobs = [];
+          }
+
+          const normalized = jobs.map(j => ({
+            id: String(j.id ?? Date.now() + Math.random()),
+            title: j.title ?? 'Untitled',
+            company: j.company ?? '',
+            location: j.location ?? '',
+            jobType: j.jobType ?? '',
+            postedDate: j.postedDate ?? '',
+            description: j.description ?? '',
+            applyUrl: j.applyUrl ?? '#'
+          }));
+
+          setLocalJobs(normalized);
+          renderJobs(); // ✅ update the UI
+          showToast(`${normalized.length} jobs loaded`);
+          return normalized;
+        } catch (err) {
+          console.error('Jobs fetch error:', err);
+          setLocalJobs([]);
+          renderJobs();
+          showToast('Unable to load jobs');
+          return [];
+        }
+      }
+
+      // wire refresh to call server API and render
+      document.getElementById('btnRefreshJobs')?.addEventListener('click', async () => {
+        try { await fetchJobsFromServer(); } catch (e) { console.error(e); showToast('Refresh failed'); }
+      });
+
+      // wire filters & search & sort (debounced input)
+      jobFilter?.addEventListener('change', renderJobs);
+      jobSort?.addEventListener('change', renderJobs);
+      jobSearch?.addEventListener('input', debounce(() => renderJobs(), 220));
+      jobSearch?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { renderJobs(); } });
+
+      // initial job load: try server, fallback to local
+      (async function initJobs() { await fetchJobsFromServer(); renderJobs(); })();
+
+      /* --- ADMIN: load lists / CRUD for jobs & tests (same logic as you had) --- */
+      function loadAdminDataLists() {
+        // jobs list
+        const jobs = getLocalJobs();
+        const jobsList = document.getElementById('admin_jobs_list');
+        if (!jobsList) return;
+        jobsList.innerHTML = '';
+        if (!jobs.length) jobsList.innerHTML = '<div class="small-muted">No jobs.</div>';
+        jobs.forEach(j => {
+          const row = document.createElement('div');
+          row.style.padding = '8px';
+          row.style.borderBottom = '1px solid #f1f1f1';
+          row.innerHTML = `<div style="font-weight:900">${escapeHtml(j.title)}</div>
+        <div class="kb">${escapeHtml(j.company || '')} • ${escapeHtml(j.location || '')} • ${escapeHtml(j.jobType || '')}</div>
+        <div style="margin-top:6px;display:flex;gap:6px;justify-content:flex-end">
+          <button class="btn ghost admin-edit-job" data-id="${escapeAttr(j.id)}">Edit</button>
+          <button class="btn primary admin-delete-job" data-id="${escapeAttr(j.id)}">Delete</button>
+        </div>`;
+          jobsList.appendChild(row);
+        });
+        jobsList.querySelectorAll('.admin-edit-job').forEach(b => b.addEventListener('click', (e) => {
+          const id = e.currentTarget.dataset.id;
+          const job = getLocalJobs().find(x => String(x.id) === String(id));
+          if (!job) return;
+          document.getElementById('admin_job_title').value = job.title;
+          document.getElementById('admin_job_company').value = job.company;
+          document.getElementById('admin_job_location').value = job.location;
+          document.getElementById('admin_job_type').value = job.jobType;
+          document.getElementById('admin_job_apply').value = job.applyUrl;
+          document.getElementById('admin_job_desc').value = job.description;
+          document.getElementById('admin_update_job').dataset.editing = id;
+          document.getElementById('admin_update_job').style.display = '';
+          document.getElementById('admin_add_job').style.display = 'none';
+        }));
+        jobsList.querySelectorAll('.admin-delete-job').forEach(b => b.addEventListener('click', (e) => {
+          const id = e.currentTarget.dataset.id;
+          if (!confirm('Delete job?')) return;
+          const arr = getLocalJobs().filter(x => String(x.id) !== String(id));
+          setLocalJobs(arr);
+          renderJobs();
+          loadAdminDataLists();
+          showToast('Job deleted');
+        }));
+
+        // tests list
+        const tests = lsGet(TESTS_KEY, []);
+        const testsList = document.getElementById('admin_tests_list');
+        testsList.innerHTML = '';
+        if (!tests.length) testsList.innerHTML = '<div class="small-muted">No tests.</div>';
+        tests.forEach(t => {
+          const row = document.createElement('div');
+          row.style.padding = '8px';
+          row.style.borderBottom = '1px solid #f1f1f1';
+          row.innerHTML = `<div style="font-weight:900">${escapeHtml(t.title)}</div>
+        <div class="kb">${t.questions?.length || 0} q</div>
+        <div style="margin-top:6px;display:flex;gap:6px;justify-content:flex-end">
+          <button class="btn ghost admin-edit-test" data-id="${escapeAttr(t.id)}">Edit</button>
+          <button class="btn primary admin-delete-test" data-id="${escapeAttr(t.id)}">Delete</button>
+        </div>`;
+          testsList.appendChild(row);
+        });
+        testsList.querySelectorAll('.admin-edit-test').forEach(b => b.addEventListener('click', (e) => {
+          const id = e.currentTarget.dataset.id;
+          const t = lsGet(TESTS_KEY, []).find(x => String(x.id) === String(id));
+          if (!t) return;
+          document.getElementById('admin_test_title').value = t.title;
+          document.getElementById('admin_test_questions').value = JSON.stringify(t.questions, null, 2);
+          document.getElementById('admin_add_test').style.display = 'none';
+          document.getElementById('admin_update_test').style.display = '';
+          document.getElementById('admin_update_test').dataset.id = t.id;
+        }));
+        testsList.querySelectorAll('.admin-delete-test').forEach(b => b.addEventListener('click', (e) => {
+          const id = e.currentTarget.dataset.id;
+          if (!confirm('Delete test?')) return;
+          const arr = lsGet(TESTS_KEY, []).filter(x => String(x.id) !== String(id));
+          lsSet(TESTS_KEY, arr);
+          loadAdminDataLists();
+          showToast('Test deleted');
+        }));
+      }
+
+      // admin add / update job
+      const adminFields = {
+        title: document.getElementById('admin_job_title'),
+        company: document.getElementById('admin_job_company'),
+        location: document.getElementById('admin_job_location'),
+        type: document.getElementById('admin_job_type'),
+        apply: document.getElementById('admin_job_apply'),
+        desc: document.getElementById('admin_job_desc')
+      };
+      document.getElementById('admin_add_job')?.addEventListener('click', () => {
+        const title = adminFields.title.value.trim();
+        if (!title) { alert('Title required'); return; }
+        const newJob = {
+          id: String(Date.now()),
+          title,
+          company: adminFields.company.value.trim(),
+          location: adminFields.location.value.trim(),
+          jobType: adminFields.type.value.trim(),
+          postedDate: new Date().toISOString().split('T')[0],
+          description: adminFields.desc.value.trim(),
+          applyUrl: adminFields.apply.value.trim() || '#'
+        };
+        const arr = getLocalJobs();
+        arr.unshift(newJob);
+        setLocalJobs(arr);
+        showToast('Job added (local)');
+        adminFields.title.value = '';
+        adminFields.company.value = '';
+        adminFields.location.value = '';
+        adminFields.type.value = '';
+        adminFields.apply.value = '';
+        adminFields.desc.value = '';
+        renderJobs();
+        loadAdminDataLists();
+      });
+
+      document.getElementById('admin_update_job')?.addEventListener('click', function () {
+        const id = this.dataset.editing;
+        if (!id) return;
+        const arr = getLocalJobs();
+        const idx = arr.findIndex(x => String(x.id) === String(id));
+        if (idx === -1) { showToast('Job not found'); return; }
+        arr[idx] = {
+          ...arr[idx],
+          title: adminFields.title.value.trim(),
+          company: adminFields.company.value.trim(),
+          location: adminFields.location.value.trim(),
+          jobType: adminFields.type.value.trim(),
+          applyUrl: adminFields.apply.value.trim() || '#',
+          description: adminFields.desc.value.trim()
+        };
+        setLocalJobs(arr);
+        showToast('Job updated (local)');
+        adminFields.title.value = '';
+        adminFields.company.value = '';
+        adminFields.location.value = '';
+        adminFields.type.value = '';
+        adminFields.apply.value = '';
+        adminFields.desc.value = '';
+        this.dataset.editing = '';
+        this.style.display = 'none';
+        document.getElementById('admin_add_job').style.display = '';
+        renderJobs();
+        loadAdminDataLists();
+      });
+
+      /* Admin tests CRUD */
+      function safeParseJSON(s) { try { return JSON.parse(s); } catch (e) { return null; } }
+      document.getElementById('admin_add_test')?.addEventListener('click', () => {
+
+        const title = document.getElementById('admin_test_title').value.trim();
+        const questionsRaw = document.getElementById('admin_test_questions').value.trim();
+        if (!title || !questionsRaw) { alert('Title and questions required'); return; }
+        const parsed = safeParseJSON(questionsRaw);
+        if (!Array.isArray(parsed)) { alert('Questions must be a JSON array'); return; }
+        const ok = parsed.every(q => q && typeof q.q === 'string' && Array.isArray(q.choices) && typeof q.answerIndex === 'number');
+        if (!ok) { alert('Each question must have q, choices (array) and answerIndex (number)'); return; }
+        const tests = lsGet(TESTS_KEY, []);
+        tests.unshift({ id: String(Date.now()), title, questions: parsed });
+        lsSet(TESTS_KEY, tests);
+        showToast('Test added');
+        document.getElementById('admin_test_title').value = '';
+        document.getElementById('admin_test_questions').value = '';
+        loadAdminDataLists();
+      });
+
+      document.getElementById('admin_update_test')?.addEventListener('click', function () {
+        const id = this.dataset.id;
+        const title = document.getElementById('admin_test_title').value.trim();
+        const questionsRaw = document.getElementById('admin_test_questions').value.trim();
+        if (!title || !questionsRaw) { alert('Title and questions required'); return; }
+        const parsed = safeParseJSON(questionsRaw);
+        if (!Array.isArray(parsed)) { alert('Questions must be a JSON array'); return; }
+        const tests = lsGet(TESTS_KEY, []);
+        const idx = tests.findIndex(x => String(x.id) === String(id));
+        if (idx === -1) { showToast('Test not found'); return; }
+        tests[idx] = { ...tests[idx], title, questions: parsed };
+        lsSet(TESTS_KEY, tests);
+        showToast('Test updated');
+        document.getElementById('admin_test_title').value = '';
+        document.getElementById('admin_test_questions').value = '';
+        this.style.display = 'none';
+        document.getElementById('admin_add_test').style.display = '';
+        loadAdminDataLists();
+      });
+
+      document.getElementById('admin_clear_test')?.addEventListener('click', () => {
+        document.getElementById('admin_test_title').value = '';
+        document.getElementById('admin_test_questions').value = '';
+        document.getElementById('admin_update_test').style.display = 'none';
+        document.getElementById('admin_add_test').style.display = '';
+      });
+
+      /* Admin import/export */
+      document.getElementById('admin_export_all')?.addEventListener('click', () => {
+        const payload = {
+          jobs: getLocalJobs(),
+          tests: lsGet(TESTS_KEY, []),
+          bookmarks: lsGet(BOOKMARKS_KEY, []),
+          applications: lsGet(APPS_KEY, []),
+          resume: lsGet(RESUME_UPLOAD_KEY, null),
+          progress: lsGet(PROGRESS_KEY, null)
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'careerhub-export.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+        showToast('Export created');
+      });
+
+      document.getElementById('admin_import_all')?.addEventListener('click', () => {
+        const inp = document.getElementById('adminImportFile');
+        if (!inp) return;
+        inp.value = '';
+        inp.click();
+      });
+      document.getElementById('adminImportFile')?.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = function (evt) {
+          try {
+            const data = JSON.parse(evt.target.result);
+            if (data.jobs) lsSet(JOBS_KEY, data.jobs);
+            if (data.tests) lsSet(TESTS_KEY, data.tests);
+            if (data.bookmarks) lsSet(BOOKMARKS_KEY, data.bookmarks);
+            if (data.applications) lsSet(APPS_KEY, data.applications);
+            if (data.resume) lsSet(RESUME_UPLOAD_KEY, data.resume);
+            if (data.progress) lsSet(PROGRESS_KEY, data.progress);
+            showToast('Import applied (client-only)');
+            renderJobs();
+            loadUploadedResume();
+            loadAdminDataLists();
+            renderBookmarks();
+          } catch (err) {
+            alert('Invalid JSON file');
+          }
+        };
+        r.readAsText(f);
+      });
+
+      /* Boot tasks */
+      loadUploadedResume();
+      renderBookmarks();
+      renderTestResultsSummary();
+      showPanel('jobs');
+
+      /* small utility */
+      window.downloadDemo = function (name) {
+        const txt = `Demo resume: ${name}\n\nThis is a placeholder file. Replace with real template in production.`;
+        const blob = new Blob([txt], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = name.replace(/\s+/g, '_') + '.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      };
+
+    })();
+    /* --- JOBS: paginated fetch from server --- */
+    let currentPage = 0;
+    const PAGE_SIZE = 20;
+    let totalElements = 0;
+
+    async function loadNextPage() {
+      try {
+        const r = await fetch(`/api/jobs?page=${currentPage}&size=${PAGE_SIZE}`);
+        if (!r.ok) throw new Error('Job API returned ' + r.status);
+        const pageObj = await r.json();
+
+        // normalize jobs
+        const jobs = (pageObj.content || []).map(j => ({
+          id: String(j.id),
+          title: j.title || 'Untitled',
+          company: j.company || '',
+          location: j.location || '',
+          jobType: j.jobType || '',
+          postedDate: j.postedDate || '',
+          description: j.description || '',
+          applyUrl: j.applyUrl || '#'
+        }));
+
+        // append to local storage list
+        const arr = getLocalJobs();
+        const merged = [...arr, ...jobs];
+        setLocalJobs(merged);
+
+        // re-render
+        renderJobs();
+
+        // update state
+        currentPage++;
+        totalElements = pageObj.totalElements || merged.length;
+        jobsCount.textContent = `${merged.length} posting(s)`;
+
+        // hide Load More if done
+        if (merged.length >= totalElements) {
+          document.getElementById('loadMoreBtn').style.display = 'none';
+        } else {
+          document.getElementById('loadMoreBtn').style.display = 'inline-block';
+        }
+
+      } catch (err) {
+        console.error('Jobs fetch error:', err);
+        showToast('Unable to load jobs (API error)');
+      }
+    }
+
+    // wire up Load More button
+    document.getElementById('loadMoreBtn').addEventListener('click', loadNextPage);
+
+    // initial load
+    (async function initJobs() {
+      currentPage = 0;
+      setLocalJobs([]); // clear first
+      await loadNextPage();
+    })();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GitHub & Projects</title>
+  <style>
+    :root {
+      --bg: #e5cb58;
+      --ink: #3d3d3d;
+      --brand: #f36b4f;
+      --muted: #666;
+      --line: #ddd;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: var(--bg);
+    }
+
+    .container {
+      min-height: 100vh;
+    }
+
+    /* Sidebar: fixed on desktop */
+    .sidebar {
+      width: 260px;
+      background: var(--ink);
+      color: #fffafa;
+      padding: 20px;
+      box-sizing: border-box;
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      z-index: 20;
+    }
+
+    .brand {
+      margin: 0 0 16px;
+    }
+
+    .brand h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    /* Sidebar nav list (matches your reference look) */
+    .nav-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav-item {
+      display: block;
+      padding: 12px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      background: transparent;
+      color: #fff;
+      text-decoration: none;
+      border: 1px solid transparent;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, .07);
+    }
+
+    .nav-item.active {
+      background: #0b2b34;
+    }
+
+    .side-title {
+      font-size: 12px;
+      opacity: .85;
+      margin: 16px 0 8px;
+      letter-spacing: .5px;
+      text-transform: uppercase
+    }
+
+    .btn.side {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, .2);
+      background-color: #ffffff;
+      color: #000000;
+      cursor: pointer;
+    }
+
+    .btn.side:hover {
+      background: rgb(255, 98, 0);
+    }
+
+    .sep {
+      height: 1px;
+      background: rgb(255, 255, 255);
+      margin: 16px 0;
+    }
+
+    /* Content area */
+    .content {
+      padding: 20px;
+      margin-left: 260px;
+    }
+
+    .content h1 {
+      margin: 0 0 12px;
+    }
+
+    /* Top toolbar (hidden in REPOS mode) */
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0 12px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .toolbar input {
+      flex: 1;
+      min-width: 220px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    /* Category chips row in white space (hidden in REPOS mode) */
+    .category-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 0 0 10px
+    }
+
+    .chip-btn {
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    .chip-btn.active {
+      background: #172026;
+      color: #fff;
+      border-color: #172026;
+    }
+
+    /* Repos panel (visible only in REPOS mode) */
+    .repos-panel {
+      display: none;
+      gap: 8px;
+      align-items: center;
+      margin: 8px 0 12px;
+    }
+
+    .repos-panel input {
+      flex: 1;
+      min-width: 260px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .muted {
+      color: #666;
+      font-size: 0.9rem
+    }
+
+    .btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .btn.secondary {
+      background: #eee;
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border: 1px solid #ccc;
+    }
+
+    .btn.small {
+      padding: 6px 8px;
+      font-size: 0.9rem;
+    }
+
+    /* Table */
+    .table-wrap {
+      overflow: auto;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid var(--line)
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      min-width: 720px;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #fafafa;
+      position: sticky;
+      top: 0;
+    }
+
+    tr:hover {
+      background: #f9f9f9;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 20px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal {
+      background: #fff;
+      padding: 18px;
+      border-radius: 8px;
+      min-width: 360px;
+      max-width: 92vw;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal h3 {
+      margin-top: 0;
+    }
+
+    .modal input,
+    .modal select {
+      width: 100%;
+      margin-bottom: 8px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        margin-bottom: 10px;
+      }
+
+      .content {
+        margin-left: 0;
+        padding: 14px;
+      }
+
+      .repos-panel {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <h2>Projects Hub</h2>
+      </div>
+
+      <div class="side-title">Sections</div>
+      <ul class="nav-list" id="sideNav">
+        <li><a class="nav-item active" data-action="view-projects">GitHub & Projects</a></li>
+        <li><a class="nav-item" id="uploadNav">Add Project</a></li>
+        <li><a class="nav-item" id="discoverNav">Discover Repos</a></li>
+        <li><a class="nav-item" id="loginGithubNav">Login to GitHub</a></li>
+      </ul>
+
+      <div class="sep"></div>
+      <button class="btn side" onclick="window.location.href='/tiles'">← Back</button>
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+      <h1>GitHub & Projects</h1>
+
+      <!-- Toolbar (DB projects only) -->
+      <div class="toolbar" id="toolbar">
+        <input type="text" id="searchBox" placeholder="Search projects..." />
+        <button class="btn secondary" id="searchBtn">Search</button>
+        <button class="btn primary" id="refreshBtn">Refresh</button>
+      </div>
+
+      <!-- Chips (DB projects only) -->
+      <div class="category-row" id="categoryRow">
+        <button class="chip-btn active" data-cat="">All</button>
+        <button class="chip-btn" data-cat="FINAL">Final Year Projects</button>
+        <button class="chip-btn" data-cat="4-1">4-1</button>
+        <button class="chip-btn" data-cat="3-2">3-2</button>
+        <button class="chip-btn" data-cat="2-2">2-2</button>
+        <button class="chip-btn" data-cat="GENERAL">General</button>
+      </div>
+
+      <!-- Repos panel (REPOS mode only) -->
+      <div class="repos-panel" id="reposPanel">
+        <input type="text" id="publicUser" placeholder="GitHub user / org">
+        <div style="display:flex; gap:8px;">
+          <button class="btn secondary" id="reposSearchBtn">Search Repos</button>
+          <button class="btn ghost" id="reposCloseBtn">Close</button>
+        </div>
+      </div>
+
+      <div id="contextNote" class="muted" style="margin:4px 0 10px;"></div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Project Title / Repo</th>
+              <th>Owner</th>
+              <th>Tech Stack / Language</th>
+              <th>Year</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="projectsBody">
+            <tr>
+              <td colspan="5" class="empty">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="text-align:center;margin-top:12px;">
+        <button class="btn secondary" id="loadMoreBtn">Load more</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Project Modal -->
+  <div id="uploadModal" class="modal-backdrop" role="dialog" aria-hidden="true">
+    <div class="modal" role="document">
+      <h3>Add Project</h3>
+      <input id="newTitle" placeholder="Title">
+      <input id="newOwner" placeholder="Owner">
+      <input id="newTech" placeholder="Tech Stack">
+      <input id="newYear" placeholder="Year">
+      <input id="newGithub" placeholder="GitHub URL">
+      <select id="newCategory">
+        <option value="FINAL">Final Year Projects</option>
+        <option value="4-1">4-1</option>
+        <option value="3-2">3-2</option>
+        <option value="2-2">2-2</option>
+        <option value="GENERAL">General</option>
+      </select>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+        <button class="btn primary" onclick="addProject()">Save</button>
+        <button class="btn secondary" onclick="closeModal('uploadModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="modal-backdrop" role="dialog" aria-hidden="true">
+    <div class="modal" role="document">
+      <h3>Edit Project</h3>
+      <input id="editId" type="hidden">
+      <input id="editTitle" placeholder="Title">
+      <input id="editOwner" placeholder="Owner">
+      <input id="editTech" placeholder="Tech Stack">
+      <input id="editYear" placeholder="Year">
+      <input id="editGithub" placeholder="GitHub URL">
+      <select id="editCategory">
+        <option value="FINAL">Final Year Projects</option>
+        <option value="4-1">4-1</option>
+        <option value="3-2">3-2</option>
+        <option value="2-2">2-2</option>
+        <option value="GENERAL">General</option>
+      </select>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+        <button class="btn primary" onclick="updateProject()">Update</button>
+        <button class="btn secondary" onclick="closeModal('editModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ====== Constants ====== */
+    const API = "/api/projects";
+    const GITHUB_PUBLIC = "/api/github/public-repos";
+    /* If using OAuth, set to '/oauth2/authorization/github' */
+    const GITHUB_LOGIN_URL = "https://github.com/login";
+
+    let page = 0, query = "", uiCategory = "", mode = "PROJECTS"; // PROJECTS | REPOS
+
+    /* ====== Helpers to show/hide groups ====== */
+    function setMode(newMode) {
+      mode = newMode;
+      const showRepos = (mode === 'REPOS');
+      document.getElementById('toolbar').style.display = showRepos ? 'none' : 'flex';
+      document.getElementById('categoryRow').style.display = showRepos ? 'none' : 'flex';
+      document.getElementById('reposPanel').style.display = showRepos ? 'flex' : 'none';
+    }
+
+    /* ====== Sidebar nav ====== */
+    function activateSide(action) {
+      document.querySelectorAll('#sideNav .nav-item').forEach(a => a.classList.remove('active'));
+      const el = Array.from(document.querySelectorAll('#sideNav .nav-item')).find(a => a.dataset.action === action) ||
+        document.getElementById(action);
+      if (el) el.classList.add('active');
+    }
+
+    document.querySelector('[data-action="view-projects"]').onclick = () => {
+      activateSide('view-projects');
+      setMode('PROJECTS'); uiCategory = ""; page = 0; markActiveChip(""); document.getElementById('contextNote').textContent = ""; load(true);
+    };
+    document.getElementById("uploadNav").onclick = () => openModal("uploadModal");
+    document.getElementById("discoverNav").onclick = () => {
+      activateSide('discoverNav');
+      setMode('REPOS'); uiCategory = "REPOS"; markActiveChip('REPOS'); document.getElementById('publicUser').focus(); page = 0; load(true);
+    };
+    document.getElementById("loginGithubNav").onclick = () => {
+      activateSide('loginGithubNav');
+      window.open(GITHUB_LOGIN_URL, '_blank', 'noopener');
+    };
+
+    /* ====== Top toolbar actions ====== */
+    document.getElementById("searchBtn").onclick = () => { page = 0; query = document.getElementById('searchBox').value.trim(); load(true); };
+    document.getElementById("refreshBtn").onclick = () => { page = 0; query = ""; uiCategory = ""; markActiveChip(""); setMode('PROJECTS'); document.getElementById('contextNote').textContent = ""; load(true); };
+
+    /* ====== Chips ====== */
+    Array.from(document.querySelectorAll(".chip-btn")).forEach(btn => {
+      btn.onclick = () => {
+        const cat = btn.getAttribute("data-cat") || "";
+        markActiveChip(cat);
+        if (cat === 'REPOS') { setMode('REPOS'); uiCategory = 'REPOS'; document.getElementById('publicUser').focus(); }
+        else { setMode('PROJECTS'); uiCategory = cat; }
+        page = 0; load(true);
+      };
+    });
+    function markActiveChip(cat) {
+      document.querySelectorAll(".chip-btn").forEach(b => b.classList.remove("active"));
+      const t = Array.from(document.querySelectorAll(".chip-btn")).find(b => (b.getAttribute("data-cat") || "") === cat);
+      if (t) t.classList.add("active");
+    }
+
+    /* ====== Repos panel controls ====== */
+    document.getElementById("reposSearchBtn").onclick = () => { setMode('REPOS'); load(true); };
+    document.getElementById("reposCloseBtn").onclick = () => {
+      setMode('PROJECTS'); uiCategory = ""; markActiveChip(""); page = 0; load(true);
+    };
+
+    /* ====== Modals ====== */
+    function openModal(id) { const el = document.getElementById(id); el.style.display = 'flex'; el.setAttribute('aria-hidden', 'false'); }
+    function closeModal(id) { const el = document.getElementById(id); el.style.display = 'none'; el.setAttribute('aria-hidden', 'true'); }
+
+    /* ====== Category map (UI -> backend enum) ====== */
+    function toEnum(uiCat) {
+      switch (uiCat) {
+        case 'FINAL': return 'SHOWCASE';
+        case '4-1': return 'SAMPLE';
+        case '3-2': return 'TEMPLATE';
+        case '2-2': return 'OPEN_SOURCE';
+        case 'GENERAL': return 'IDEA';
+        default: return '';
+      }
+    }
+    function fromEnum(en) {
+      switch ((en || '').toUpperCase()) {
+        case 'SHOWCASE': return 'FINAL';
+        case 'SAMPLE': return '4-1';
+        case 'TEMPLATE': return '3-2';
+        case 'OPEN_SOURCE': return '2-2';
+        case 'IDEA': return 'GENERAL';
+        default: return 'GENERAL';
+      }
+    }
+
+    /* ====== Load dispatcher ====== */
+    function load(clear) { (mode === 'REPOS') ? loadPublicRepos(clear) : loadProjects(clear); }
+
+    /* ====== Projects (DB) ====== */
+    async function loadProjects(clear) {
+      const bodyEl = document.getElementById("projectsBody");
+      const loadMoreBtn = document.getElementById("loadMoreBtn");
+      const catEnum = toEnum(uiCategory);
+      const note = document.getElementById('contextNote');
+
+      if (clear) bodyEl.innerHTML = "<tr><td colspan='5' class='empty'>Loading projects...</td></tr>";
+      try {
+        const url = `${API}?page=${page}&size=10&q=${encodeURIComponent(query)}&category=${catEnum}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(res.status);
+        const data = await res.json();
+        const items = data.content || [];
+
+        if (page === 0) bodyEl.innerHTML = "";
+        if (!items.length && page === 0) {
+          bodyEl.innerHTML = "<tr><td colspan='5' class='empty'>No projects found</td></tr>";
+          loadMoreBtn.style.display = 'none'; note.textContent = ""; return;
+        }
+
+        items.forEach(p => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+        <td>${escapeHtml(p.title)}</td>
+        <td>${escapeHtml(p.owner)}</td>
+        <td>${escapeHtml(p.techStack)}</td>
+        <td>${p.year || ""}</td>
+        <td class="actions">
+          <button class="btn small" onclick="openInNew('${p.githubUrl || ''}')">GitHub</button>
+          <button class="btn small" onclick="showEdit(${p.id}, '${escapeHtml(p.title)}', '${escapeHtml(p.owner)}', '${escapeHtml(p.techStack)}', ${p.year || ''}, '${p.githubUrl || ''}', '${p.category || ''}')">Edit</button>
+          <button class="btn small" onclick="deleteProject(${p.id})">Delete</button>
+        </td>
+      `;
+          bodyEl.appendChild(tr);
+        });
+
+        page++;
+        loadMoreBtn.style.display = (page * 10 >= (data.totalElements || 0)) ? 'none' : 'inline-block';
+        note.textContent = "";
+      } catch (e) {
+        console.error(e);
+        bodyEl.innerHTML = "<tr><td colspan='5' class='empty'>Error loading projects</td></tr>";
+        document.getElementById("loadMoreBtn").style.display = 'none';
+        note.textContent = "";
+      }
+    }
+
+    /* ====== Public Repos (GitHub) ====== */
+    async function loadPublicRepos(clear) {
+      const bodyEl = document.getElementById("projectsBody");
+      const loadMoreBtn = document.getElementById("loadMoreBtn");
+      const user = document.getElementById("publicUser").value.trim();
+      const note = document.getElementById('contextNote');
+
+      if (!user) { alert("Enter a GitHub user or org"); return; }
+      if (clear) bodyEl.innerHTML = "<tr><td colspan='5' class='empty'>Fetching public repos...</td></tr>";
+
+      try {
+        const res = await fetch(`${GITHUB_PUBLIC}?user=${encodeURIComponent(user)}`);
+        const text = await res.text();
+        const data = JSON.parse(text);
+        if (!Array.isArray(data) || !data.length) {
+          bodyEl.innerHTML = "<tr><td colspan='5' class='empty'>No repos found</td></tr>";
+          loadMoreBtn.style.display = 'none'; note.textContent = `Showing repos for: ${user}`; return;
+        }
+        bodyEl.innerHTML = "";
+        data.forEach(r => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+        <td>${escapeHtml(r.name)}</td>
+        <td>${escapeHtml(r.owner?.login || "")}</td>
+        <td>${escapeHtml(r.language || "")}</td>
+        <td>${r.created_at ? r.created_at.slice(0, 4) : ""}</td>
+        <td class="actions">
+          <button class="btn small" onclick="openInNew('${r.html_url}')">View</button>
+        </td>
+      `;
+          bodyEl.appendChild(tr);
+        });
+        loadMoreBtn.style.display = 'none';
+        note.textContent = `Showing repos for: ${user}`;
+      } catch (err) {
+        console.error(err);
+        bodyEl.innerHTML = "<tr><td colspan='5' class='empty'>Error loading public repos</td></tr>";
+        document.getElementById("loadMoreBtn").style.display = 'none';
+        note.textContent = `Showing repos for: ${user}`;
+      }
+    }
+
+    /* ====== CRUD helpers ====== */
+    async function addProject() {
+      const body = {
+        title: document.getElementById('newTitle').value,
+        owner: document.getElementById('newOwner').value,
+        techStack: document.getElementById('newTech').value,
+        year: parseInt(document.getElementById('newYear').value),
+        githubUrl: document.getElementById('newGithub').value,
+        category: toEnum(document.getElementById('newCategory').value)
+      };
+      await fetch(API, { method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      closeModal('uploadModal'); page = 0; setMode('PROJECTS'); uiCategory = ""; markActiveChip(""); load(true);
+    }
+
+    function showEdit(id, title, owner, tech, year, url, cat) {
+      document.getElementById('editId').value = id;
+      document.getElementById('editTitle').value = unescapeHtml(title);
+      document.getElementById('editOwner').value = unescapeHtml(owner);
+      document.getElementById('editTech').value = unescapeHtml(tech);
+      document.getElementById('editYear').value = year || "";
+      document.getElementById('editGithub').value = url || "";
+      document.getElementById('editCategory').value = fromEnum(cat);
+      openModal('editModal');
+    }
+
+    async function updateProject() {
+      const id = document.getElementById('editId').value;
+      const body = {
+        title: document.getElementById('editTitle').value,
+        owner: document.getElementById('editOwner').value,
+        techStack: document.getElementById('editTech').value,
+        year: parseInt(document.getElementById('editYear').value),
+        githubUrl: document.getElementById('editGithub').value,
+        category: toEnum(document.getElementById('editCategory').value)
+      };
+      await fetch(`${API}/${id}`, { method: "PUT", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      closeModal('editModal'); load(true);
+    }
+
+    async function deleteProject(id) {
+      if (!confirm("Delete this project?")) return;
+      await fetch(`${API}/${id}`, { method: "DELETE" });
+      load(true);
+    }
+
+    /* ====== Utilities ====== */
+    function openInNew(url) { if (url) window.open(url, '_blank', 'noopener'); }
+    function escapeHtml(s) { return (s || "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[m])); }
+    function unescapeHtml(s) { return (s || "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'"); }
+
+    /* ====== First paint ====== */
+    setMode('PROJECTS');
+    load(true);
+  </script>
+</body>
+
+</html>

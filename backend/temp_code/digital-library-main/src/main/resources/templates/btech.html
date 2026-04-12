@@ -1,0 +1,639 @@
+<!-- File: src/main/resources/templates/btech.html -->
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>B.Tech Catalog</title>
+  <style>
+    :root {
+      --muted: #666;
+      --accent: #ff6b6b;
+      --sidebar: #3d3a3a;
+      --beige: #e9d6b0;
+      --content-pad: 28px;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--beige);
+      color: #111;
+    }
+
+    /* LEFT SIDEBAR - FIXED */
+    .left {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 300px;
+      background: var(--sidebar);
+      color: #fff;
+      padding: 22px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 30;
+    }
+
+    .left h1 {
+      color: #ff8080;
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .left h2 {
+      color: #ff8080;
+      margin: 6px 0 10px 0;
+      font-size: 20px;
+      line-height: 1.1;
+    }
+
+    .menu {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .menu button {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 0;
+      cursor: pointer;
+      font-weight: 700;
+      background: #695859;
+      color: #ffd0b0;
+    }
+
+    .menu button.active {
+      background: #ff9f6b;
+      color: #2b1b1b;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .logout-btn {
+      background: #ff9f6b;
+      color: #111;
+      font-weight: bold;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: auto;
+      margin-left: 0px;
+      margin-right: 150px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.2s ease-in-out;
+    }
+
+    .logout-btn:hover {
+      background: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    /* RIGHT CONTENT */
+    .right {
+      margin-left: 300px;
+      /* leave room for fixed sidebar */
+      padding: var(--content-pad);
+      box-sizing: border-box;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      gap: 12px
+    }
+
+    .muted {
+      color: var(--muted)
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap
+    }
+
+    .filter-row input,
+    .filter-row select {
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc
+    }
+
+    .panel {
+      background: transparent;
+      padding: 8px
+    }
+
+    .section-title {
+      margin: 18px 0 8px 0;
+      font-size: 20px;
+      font-weight: 800
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    }
+
+    th,
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      text-align: center;
+      vertical-align: middle
+    }
+
+    th {
+      background: #f9e6e6;
+      font-weight: 800
+    }
+
+    button.action {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 0;
+      background: #430052;
+      color: #ff9b3a;
+      cursor: pointer
+    }
+
+    button.pay {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 0;
+      background: #0077cc;
+      color: #fff;
+      cursor: pointer
+    }
+
+    .small {
+      font-size: 0.9rem
+    }
+
+    /* responsive */
+    @media (max-width:1000px) {
+      .left {
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        padding: 12px;
+        align-items: flex-start;
+        z-index: 10;
+      }
+
+      .right {
+        margin-left: 0;
+        padding: 12px;
+      }
+
+      .left h2 {
+        font-size: 16px
+      }
+
+      table th,
+      td {
+        padding: 10px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="left" role="complementary" aria-label="Sidebar">
+    <div>
+      <h2 id="leftBig">Welcome to B.Tech Catalog</h2>
+    </div>
+
+    <nav class="menu" aria-label="Catalog menu">
+      <button id="btnAvailable" class="active" onclick="showAvailable()">Available Books</button>
+      <button id="btnBorrowed" onclick="showBorrowed()">Your Borrowed Books</button>
+    </nav>
+
+
+    <button class="logout-btn" onclick="goBack()" aria-label="goback">⬅ Back</button>
+  </div>
+
+  <main class="right" role="main">
+    <div class="topbar">
+      <div>
+        <h2 id="pageTitle">B.Tech Catalog</h2>
+        <div class="muted">Welcome, <span id="welcomeEmail">User</span></div>
+      </div>
+      <div class="muted small">Program: <strong>B.Tech</strong></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="panel">
+      <div class="filter-row">
+        <label>Year:
+          <select id="yearFilter" onchange="applyFilters()">
+            <option value="">All</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </label>
+
+        <label>Sem:
+          <select id="semFilter" onchange="applyFilters()">
+            <option value="">All</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </label>
+
+        <input id="searchQ" placeholder="Search title or author" oninput="debouncedFilter()" style="min-width:240px" />
+
+        <div style="margin-left:auto;" class="small muted">Tip: Click View to open PDF</div>
+      </div>
+    </div>
+
+    <!-- AVAILABLE BOOKS -->
+    <section id="availableSection" class="panel" aria-labelledby="availableTitle">
+      <div class="section-title" id="availableTitle">Available Books</div>
+      <table id="booksTable" aria-describedby="Available Books">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Sem</th>
+            <th>Year</th>
+            <th>Rack</th>
+            <th>Available Copies</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="booksTableBody"></tbody>
+      </table>
+    </section>
+
+    <!-- BORROWED BOOKS -->
+    <section id="borrowedSection" class="panel" style="display:none" aria-labelledby="borrowedTitle">
+      <div class="section-title" id="borrowedTitle">Your Borrowed Books</div>
+      <table id="myBooksTable">
+        <thead>
+          <tr>
+            <th>Book ID</th>
+            <th>Title</th>
+            <th>Borrowed</th>
+            <th>Expected Return</th>
+            <th>Exact Return</th>
+            <th>Book Code</th>
+            <th>Fine (₹)</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="myBorrowTable"></tbody>
+      </table>
+    </section>
+
+    <!-- Admin panel (visible for admin role) -->
+    <div id="adminPanel" class="panel" style="display:none; margin-top:18px">
+      <h3>Admin Controls</h3>
+      <button onclick="approveRequests()">Approve Borrowing</button>
+      <button onclick="loadBorrowedList()">View Borrowed List</button>
+    </div>
+
+  </main>
+
+  <script>
+    /* ===================
+       Config & globals
+       =================== */
+    const API_BASE = '/api';           // adjust if your API base differs
+    const RAZORPAY_KEY = '<YOUR_RAZORPAY_KEY_HERE>'; // put your Razorpay KeyId
+    const email = localStorage.getItem('email') || '';
+    const role = localStorage.getItem('role') || '';
+    document.getElementById('welcomeEmail').textContent = email || 'Guest';
+
+    if (role === 'admin') document.getElementById('adminPanel').style.display = 'block';
+
+    /* Data holders */
+    let allBooks = [];
+    let currentBooks = [];  // B.Tech and filters
+    let myBorrows = [];
+
+    /* Sidebar toggle functions */
+    function showAvailable() {
+      document.getElementById('availableSection').style.display = '';
+      document.getElementById('borrowedSection').style.display = 'none';
+      document.getElementById('btnAvailable').classList.add('active');
+      document.getElementById('btnBorrowed').classList.remove('active');
+      renderBooks(currentBooks);
+    }
+    function showBorrowed() {
+      document.getElementById('availableSection').style.display = 'none';
+      document.getElementById('borrowedSection').style.display = '';
+      document.getElementById('btnAvailable').classList.remove('active');
+      document.getElementById('btnBorrowed').classList.add('active');
+      loadMyBorrowed();
+    }
+
+    /* Load books from server */
+    async function loadBooks() {
+      try {
+        const res = await fetch(API_BASE + '/books/all');
+        allBooks = await res.json();
+        currentBooks = allBooks.filter(b => programMatch(b));
+        applyFilters();
+      } catch (err) {
+        console.error('loadBooks', err);
+        alert('Failed to load books from server.');
+      }
+    }
+
+    /* detect B.Tech */
+    function programMatch(b) {
+      const c = (b.category || '').toString().toLowerCase();
+      return c.includes('b.tech') || c.includes('btech') || c.includes('b tech') || ((c.includes('b') && c.includes('tech')));
+    }
+
+    /* render available books */
+    function renderBooks(list) {
+      const tbody = document.getElementById('booksTableBody');
+      tbody.innerHTML = '';
+      if (!list || list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="muted">No books found</td></tr>';
+        return;
+      }
+      list.forEach(b => {
+        const avail = b.available ?? b.availableCopies ?? 0;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+      <td>${b.id}</td>
+      <td>${escapeHTML(b.title)}</td>
+      <td>${escapeHTML(b.author)}</td>
+      <td>${b.semester ?? '-'}</td>
+      <td>${b.year ?? '-'}</td>
+      <td>${escapeHTML(b.rack ?? '-')}</td>
+      <td>${avail}</td>
+      <td>
+        <button class="action" onclick="viewPdf(${b.id})">View</button>
+        ${role !== 'admin' ? `<button class="action" onclick="borrowBook(${b.id})">Borrow</button>` : ''}
+      </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* Filters */
+    let filterTimer = null;
+    function debouncedFilter() { clearTimeout(filterTimer); filterTimer = setTimeout(applyFilters, 220); }
+
+    function applyFilters() {
+      const year = document.getElementById('yearFilter').value;
+      const sem = document.getElementById('semFilter').value;
+      const q = (document.getElementById('searchQ').value || '').trim().toLowerCase();
+
+      let list = currentBooks.slice();
+      if (year) list = list.filter(b => String(b.year) === String(year));
+      if (sem) list = list.filter(b => String(b.semester) === String(sem) || String(b.sem) === String(sem));
+      if (q) list = list.filter(b => ((b.title || '') + ' ' + (b.author || '') + ' ' + (b.subject || '')).toLowerCase().includes(q));
+      renderBooks(list);
+    }
+
+    /* Book actions */
+    function escapeHTML(s) { if (!s) return ''; return String(s).replaceAll('<', '&lt;').replaceAll('>', '&gt;'); }
+
+    function viewPdf(bookId) {
+      window.open(`${API_BASE}/books/pdf/${bookId}`, '_blank');
+    }
+
+    async function borrowBook(bookId) {
+      if (!email) return alert('Please login to request a book.');
+      if (!confirm('Send borrow request to admin for this book?')) return;
+      try {
+        const res = await fetch(`${API_BASE}/borrow/request?email=${encodeURIComponent(email)}&bookId=${bookId}`, { method: 'POST' });
+        const j = await res.json();
+        alert(j.message || 'Borrow request sent');
+        loadMyBorrowed();
+        loadBooks();
+      } catch (err) {
+        console.error('borrowBook', err);
+        alert('Failed to send borrow request.');
+      }
+    }
+
+    /* My borrowed books */
+    async function loadMyBorrowed() {
+      if (!email) {
+        document.getElementById('myBorrowTable').innerHTML = '<tr><td colspan="8" class="muted">Login to view your borrowed books</td></tr>';
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/borrow/my-books?email=${encodeURIComponent(email)}`);
+        myBorrows = await res.json();
+        renderMyBorrows(myBorrows);
+      } catch (err) {
+        console.error('loadMyBorrowed', err);
+        document.getElementById('myBorrowTable').innerHTML = '<tr><td colspan="8">Error loading borrowed books</td></tr>';
+      }
+    }
+
+    function renderMyBorrows(arr) {
+      const tbody = document.getElementById('myBorrowTable');
+      tbody.innerHTML = '';
+      if (!arr || arr.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="muted">No borrowed books</td></tr>';
+        return;
+      }
+      arr.forEach(b => {
+        const fine = b.fineAmount ?? b.fine ?? 0;
+        let actions = '-';
+        if (b.status === 'APPROVED' && !b.returned) {
+          actions = `<button class="action" onclick="requestReturn(${b.id})">Request Return</button>`;
+        } else if (b.status === 'PENDING') {
+          actions = `<span class="muted">Request Pending</span>`;
+        } else if (b.status === 'PENDING_RETURN') {
+          actions = `<span style="color:orange;font-weight:800">Return Requested</span>`;
+        }
+        const finePaid = b.finePaid || false;
+        if (fine > 0 && !finePaid) {
+          actions += ` <button class="pay" onclick="payFine(${b.id}, ${fine})">Pay ₹${fine}</button>`;
+        }
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+      <td>${b.bookId ?? '-'}</td>
+      <td>${escapeHTML(b.bookTitle ?? '-')}</td>
+      <td>${b.borrowDate ?? '-'}</td>
+      <td>${b.expectedReturnDate ?? '-'}</td>
+      <td>${b.returnDate ?? '-'}</td>
+      <td>${escapeHTML(b.bookCode ?? '-')}</td>
+      <td>₹${fine}</td>
+      <td>${actions}</td>
+    `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* Request return */
+    async function requestReturn(borrowId) {
+      if (!confirm('Request return for this book? Admin will approve.')) return;
+      try {
+        const res = await fetch(`${API_BASE}/borrow/request-return/${borrowId}`, { method: 'POST' });
+        const j = await res.json();
+        alert(j.message || 'Return requested');
+        loadMyBorrowed();
+      } catch (err) {
+        console.error('requestReturn', err);
+        alert('Failed to request return.');
+      }
+    }
+
+    /* =========================
+       Razorpay Payment Flow
+       =========================
+       Server endpoints required:
+       - POST /api/pay/create-order  { amount: <paise>, borrowId }
+         -> returns { orderId, amount, currency }
+       - POST /api/borrow/pay-fine/{borrowId}  { razorpay_payment_id, razorpay_order_id, razorpay_signature }
+    */
+    async function payFine(borrowId, amountRupees) {
+      if (!RAZORPAY_KEY || RAZORPAY_KEY.includes('<YOUR')) {
+        return alert('Razorpay key not configured. Set RAZORPAY_KEY in the page.');
+      }
+      try {
+        // create order on server (server should return orderId & amount in paise)
+        const body = { amount: Math.round(amountRupees * 100), borrowId };
+        const createRes = await fetch(`${API_BASE}/pay/create-order`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+        });
+        if (!createRes.ok) throw new Error('Create order failed');
+        const order = await createRes.json(); // { orderId, amount, currency }
+
+        const options = {
+          key: RAZORPAY_KEY,
+          amount: order.amount,
+          currency: order.currency || 'INR',
+          name: "Library Fine Payment",
+          description: `Fine for borrow ${borrowId}`,
+          order_id: order.orderId,
+          handler: async function (resp) {
+            try {
+              const verifyRes = await fetch(`${API_BASE}/borrow/pay-fine/${borrowId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(resp)
+              });
+              const verifyJson = await verifyRes.json();
+              if (verifyRes.ok) {
+                alert(verifyJson.message || 'Payment successful.');
+                loadMyBorrowed(); loadBooks();
+              } else {
+                alert(verifyJson.message || 'Payment verification failed.');
+              }
+            } catch (e) {
+              console.error('verify payment', e);
+              alert('Error verifying payment on server.');
+            }
+          },
+          prefill: { email: email },
+          theme: { color: "#3399cc" }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', function (resp) {
+          console.error('payment.failed', resp);
+          alert('Payment failed: ' + (resp.error && resp.error.description ? resp.error.description : 'Unknown error'));
+        });
+        rzp.open();
+      } catch (err) {
+        console.error('payFine', err);
+        alert('Failed to initiate payment: ' + (err.message || err));
+      }
+    }
+
+    /* Admin functions */
+    async function approveRequests() {
+      try {
+        const res = await fetch(API_BASE + '/borrow/all-borrowed');
+        const arr = await res.json();
+        const pending = arr.filter(x => x.status === 'PENDING');
+        if (!pending.length) return alert('No pending requests');
+        const choices = pending.map(p => `ID:${p.id}  ${p.userEmail} -> ${p.bookTitle}`).join('\n');
+        const id = prompt('Pending:\n' + choices + '\nEnter borrow id to approve:');
+        if (!id) return;
+        const bookCode = prompt('Enter unique Book Code:');
+        if (!bookCode) return alert('Book code required');
+        const r = await fetch(API_BASE + '/admin/approve/' + id, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookCode })
+        });
+        const j = await r.json();
+        alert(j.message || 'Approved');
+        loadBooks(); loadMyBorrowed();
+      } catch (err) {
+        console.error('approveRequests', err);
+        alert('Approve failed');
+      }
+    }
+
+    async function loadBorrowedList() {
+      if (role !== 'admin') return alert('Admin only');
+      try {
+        const res = await fetch(API_BASE + '/admin/borrowed-list');
+        const arr = await res.json();
+        console.log('borrowed list', arr);
+        alert('Loaded borrowed list (see console). Admin UI can be implemented here.');
+      } catch (err) {
+        console.error('loadBorrowedList', err);
+      }
+    }
+
+    function goBack() {
+      if (document.referrer) {
+        // try to go back in history if available
+        window.history.back();
+      } else {
+        // if no referrer, send to a default page (like tiles or index)
+        window.location.href = "/tiles";
+      }
+    }
+
+    /* Init */
+    window.onload = function () {
+      loadBooks();
+      loadMyBorrowed();
+
+      // load Razorpay script
+      (function () {
+        if (document.getElementById('razorpay-script')) return;
+        const s = document.createElement('script');
+        s.id = 'razorpay-script';
+        s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        s.async = true;
+        document.body.appendChild(s);
+      })();
+    };
+
+    /* small debounce */
+    function debouncedFilter() { clearTimeout(window._flt); window._flt = setTimeout(applyFilters, 220); }
+  </script>
+</body>
+
+</html>
