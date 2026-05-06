@@ -1,0 +1,6 @@
+cd backend
+source venv/Scripts/activate
+uvicorn main:app --reload
+
+cd GitScopeAI/frontend
+npm start
